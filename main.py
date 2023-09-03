@@ -5,14 +5,14 @@ from table import Table
 
 
 def create_teams():
-    teams = Table('teams', ['team_id', 'team_name', 'team_url'])
+    teams = Table('teams', ['team_id', 'team_name', 'team_url', 'active'])
     page = requests.get('https://www.pro-football-reference.com/teams/')
     soup = BeautifulSoup(page.content, "html.parser")
     team_rows = soup.find(id="div_teams_active").find_all("th")
     team_id = 1
     for team_row in team_rows:
         if team_row.find("a") is not None:
-            team = {'team_name': team_row.text, 'team_url': team_row.find('a')['href'], 'team_id': team_id}
+            team = {'team_name': team_row.text, 'team_url': team_row.find('a')['href'], 'team_id': team_id, 'active': 1}
             team_id += 1
             teams.append(team)
     return teams
