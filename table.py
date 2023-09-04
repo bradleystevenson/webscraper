@@ -1,5 +1,6 @@
 import database_connection
 from database_connection import DatabaseConnection
+import sqlite3
 
 class Table:
 
@@ -8,11 +9,14 @@ class Table:
         self.table_columns = table_columns
         self.data = []
 
+    def create_from_table(self):
+        self.data = database_connection.get_database_connection().select_statement(self.table_name, self.table_columns)
+
+
+
     def append(self, new_row):
-        print("APPENDING NEW ROW FINALLY")
-        print(new_row)
         self.data.append(new_row)
-        print(self.data)
+
     def create_table(self):
         execution_string = 'CREATE TABLE ' + self.table_name + ' ('
         for table_column in self.table_columns:
@@ -21,6 +25,14 @@ class Table:
         database_connection.get_database_connection().execute(execution_string)
 
     def insert_data(self):
+        try:
+            self.create_table()
+        except sqlite3.OperationalError:
+            print("Cant create table, already exist yet")
+        try:
+            database_connection.get_database_connection().delete_from_table(self.table_name)
+        except sqlite3.OperationalError:
+            print("Cant delete table, doesnt exist yet")
         insert_string = 'INSERT INTO ' + self.table_name + ' ('
         for table_column in self.table_columns:
             insert_string += table_column + ', '
@@ -46,9 +58,6 @@ class ObjectTable(Table):
         self.max_id = 1
 
     def append(self, new_row):
-        print("APPEND NEW_ROW")
-        print(new_row)
-        print(self.data)
         new_row[self.primary_key] = self.max_id
         super().append(new_row)
         self.max_id += 1
@@ -57,3 +66,4 @@ class ObjectTable(Table):
         for row in self.data:
             if row[column_name] == column_value:
                 return row[self.primary_key]
+        raise Exception("No match for column value")
