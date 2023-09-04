@@ -5,7 +5,7 @@ from selenium import webdriver
 import selenium
 import sys
 import threading
-from string import ascii_lowercase
+from string import ascii_uppercase
 
 
 franchises = Table('franchises', ['franchise_id', 'franchise_name', 'franchise_url', 'active'])
@@ -13,7 +13,7 @@ leagues = ObjectTable('leagues', ['league_id', 'league_name'], 'league_id')
 league_years = ObjectTable('league_years', ['league_year_id', 'league_name', 'year', 'league_year_url'],
                            'league_year_id')
 teams = ObjectTable('teams', ['franchise_id', 'year', 'team_url', 'league_id'], 'team_id')
-
+players = ObjectTable('players', ['player_id', 'hall_of_fame', 'active', 'player_url', 'player_name', 'position'], 'player_id')
 def fetch_soup_from_page(url):
     while True:
         try:
@@ -91,7 +91,21 @@ def create_teams():
         teams.append(team)
 
 def create_players():
-    
+    for letter in ascii_uppercase:
+        print(letter)
+        soup = fetch_soup_from_page(f'https://www.pro-football-reference.com/players/{letter}')
+        player_rows = soup.find(id="div_players").find_all('p')
+        for player_row in player_rows:
+            player = {'player_url': player_row.find('a')['href'], 'player_name': player_row.find('a').text, 'position': player_row.text.split('(')[1].split(')')[0]}
+            active = 0
+            if player_row.find('b') is not None:
+                active = 1
+            player['active'] = active
+            hall_of_fame = 0
+            if '+' in player_row.text:
+                hall_of_fame = 1
+            player['hall_of_fame'] = hall_of_fame
+            players.append(player)
 
 if __name__ == '__main__':
     which_dicts = {'franchises': False, 'leagues': False, 'teams': False}
@@ -112,8 +126,12 @@ if __name__ == '__main__':
     if which_dicts['teams']:
         create_teams()
     else:
-        teams.create_from_table()
+        #teams.create_from_table()
+        pass
+    if which_dicts['players']:
+        create_players()
     franchises.insert_data()
     leagues.insert_data()
     league_years.insert_data()
-    teams.insert_data()
+    #teams.insert_data()
+    players.insert_data()
