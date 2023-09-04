@@ -59,15 +59,27 @@ def remove_old_database():
     except OSError:
         print("Could not remove file")
 
+
+
+def create_team(franchise_url):
+    soup = fetch_soup_from_page("https://www.pro-football-reference.com/" + franchise_url)
+    teams_rows = soup.find(id="team_index").find("tbody").find_all("tr")
+    for team_row in teams_rows:
+        if team_row.find('a') is not None and team_row.find('a').text.isnumeric():
+            team_dict = {'year': int(team_row.find('a').text), 'team_url': team_row.find('a')['href'], 'league_url': team_row.find_all('a')[1]['href']}
+            print(team_row)
+
+
 if __name__ == '__main__':
     remove_old_database()
     #franchises = create_franchises()
-    temp = create_years()
-    league_years = temp['league_years']
-    leagues = temp['leagues']
-    leagues.create_table()
-    leagues.insert_data()
-    league_years.create_table()
-    league_years.insert_data()
+    #temp = create_years()
+    #league_years = temp['league_years']
+    #leagues = temp['leagues']
+    #leagues.create_table()
+    #leagues.insert_data()
+    #league_years.create_table()
+    #league_years.insert_data()
     #franchises.create_table()
     #franchises.insert_data()
+    create_team("teams/crd/")
