@@ -12,7 +12,6 @@ class DatabaseConnection:
         self.conn = sqlite3.connect("/Users/administrator/Programs/football_grid_trainer/database.db")
 
     def execute(self, statement):
-        print(statement)
         self.conn.execute(statement)
         self.conn.commit()
 

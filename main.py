@@ -12,8 +12,10 @@ franchises = Table('franchises', ['franchise_id', 'franchise_name', 'franchise_u
 leagues = ObjectTable('leagues', ['league_id', 'league_name'], 'league_id')
 league_years = ObjectTable('league_years', ['league_year_id', 'league_name', 'year', 'league_year_url'],
                            'league_year_id')
-teams = ObjectTable('teams', ['franchise_id', 'year', 'team_url', 'league_id'], 'team_id')
+teams = ObjectTable('teams', ['franchise_id', 'year', 'team_url', 'league_year_id', 'team_id'], 'team_id')
 players = ObjectTable('players', ['player_id', 'hall_of_fame', 'active', 'player_url', 'player_name', 'position'], 'player_id')
+drafts = ObjectTable('drafts', ['year', 'league_year_id', 'draft_url', 'draft_id'], 'draft_id')
+draft_picks = ObjectTable('draft_picks', ['year', 'draft_id', 'round', 'pick', 'player_id', 'team_id', 'draft_pick_id'], 'draft_pick_id')
 def fetch_soup_from_page(url):
     while True:
         try:
@@ -25,6 +27,8 @@ def fetch_soup_from_page(url):
             return soup
         except selenium.common.exceptions.TimeoutException:
             print("Timed out loading page, trying again")
+        except selenium.common.exceptions.WebDriverException:
+            print("Web Driver Error, trying again")
 
 def create_franchises():
     url = 'https://www.pro-football-reference.com/teams/'
@@ -107,8 +111,34 @@ def create_players():
             player['hall_of_fame'] = hall_of_fame
             players.append(player)
 
+def create_draft_picks_for_draft(draft):
+    soup = fetch_soup_from_page("https://www.pro-football-reference.com/" + draft['draft_url'])
+    print(soup)
+    draft_rows = soup.find(id="drafts").find("tbody").find_all("tr")
+    for draft_row in draft_rows:
+        if draft_row.find('th').text.isnumeric():
+            print(draft_row)
+            draft_pick = {'round': int(draft_row.find('th').text), 'pick': int(draft_row.find_all('td')[0].text),
+                          'team_id': teams.get_primary_key_by_columns_search({'team_url': draft_row.find('a')['href'].replace('_draft', '')}),
+                          'player_id': players.get_primary_key_by_columns_search({'player_url', draft_row.find_all('a')[1]['href']})}
+            print(draft_row.find('a')['href'])
+            print(draft_pick)
+def create_draft_picks():
+    for draft in drafts.data:
+        create_draft_picks_for_draft(draft)
+def create_drafts():
+    soup = fetch_soup_from_page("https://www.pro-football-reference.com/draft/")
+    draft_rows = soup.find(id="draft_years").find('tbody').find_all('tr')
+    for draft_row in draft_rows:
+        if draft_row.find('a') is not None:
+            league_name = draft_row.find('td').text
+            year = int(draft_row.find('a').text)
+            draft_dict = {'draft_url': draft_row.find('a')['href'], 'year': draft_row.find('a').text, 'league_year_id': league_years.get_primary_key_by_columns_search({'year': year, 'league_name': league_name})}
+            drafts.append(draft_dict)
+
+
 if __name__ == '__main__':
-    which_dicts = {'franchises': False, 'leagues': False, 'teams': False}
+    which_dicts = {'franchises': False, 'leagues': False, 'teams': False, 'players': False, 'drafts': False}
     for argument in sys.argv:
         which_dicts[argument] = True
     if 'all' in sys.argv:
@@ -126,12 +156,19 @@ if __name__ == '__main__':
     if which_dicts['teams']:
         create_teams()
     else:
-        #teams.create_from_table()
-        pass
+        teams.create_from_table()
     if which_dicts['players']:
         create_players()
+    else:
+        players.create_from_table()
+    if which_dicts['drafts']:
+        create_drafts()
+    else:
+        drafts.create_from_table()
+    #create_draft_picks_for_draft({'draft_url': "/years/2023/draft.htm"})
     franchises.insert_data()
     leagues.insert_data()
     league_years.insert_data()
-    #teams.insert_data()
+    teams.insert_data()
     players.insert_data()
+    drafts.insert_data()

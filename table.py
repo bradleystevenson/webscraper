@@ -67,3 +67,15 @@ class ObjectTable(Table):
             if row[column_name] == column_value:
                 return row[self.primary_key]
         raise Exception("No match for column value")
+
+    def get_primary_key_by_columns_search(self, search_dict):
+        for row in self.data:
+            if self._is_match(row, search_dict):
+                return row[self.primary_key]
+        print(search_dict)
+        raise Exception("No Match for " + str(search_dict))
+    def _is_match(self, row, search_dict):
+        for key in search_dict.keys():
+            if row[key] != search_dict[key]:
+                return False
+        return True
