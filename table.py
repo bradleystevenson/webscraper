@@ -74,6 +74,8 @@ class ObjectTable(Table):
                 return row[self.primary_key]
         print(search_dict)
         raise Exception("No Match for " + str(search_dict))
+
+
     def _is_match(self, row, search_dict):
         for key in search_dict.keys():
             if row[key] != search_dict[key]:

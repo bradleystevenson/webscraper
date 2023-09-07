@@ -1,12 +1,8 @@
-from bs4 import BeautifulSoup
 import os
 from table import Table, ObjectTable
-from selenium import webdriver
-import selenium
 import sys
-import threading
 from string import ascii_uppercase
-
+from webscraper import fetch_soup_from_page
 
 franchises = Table('franchises', ['franchise_id', 'franchise_name', 'franchise_url', 'active'])
 leagues = ObjectTable('leagues', ['league_id', 'league_name'], 'league_id')
@@ -16,19 +12,7 @@ teams = ObjectTable('teams', ['franchise_id', 'year', 'team_url', 'league_year_i
 players = ObjectTable('players', ['player_id', 'hall_of_fame', 'active', 'player_url', 'player_name', 'position'], 'player_id')
 drafts = ObjectTable('drafts', ['year', 'league_year_id', 'draft_url', 'draft_id'], 'draft_id')
 draft_picks = ObjectTable('draft_picks', ['year', 'draft_id', 'round', 'pick', 'player_id', 'team_id', 'draft_pick_id'], 'draft_pick_id')
-def fetch_soup_from_page(url):
-    while True:
-        try:
-            driver = webdriver.Chrome()
-            driver.get(url)
-            page = driver.page_source
-            driver.quit()
-            soup = BeautifulSoup(page, 'html.parser')
-            return soup
-        except selenium.common.exceptions.TimeoutException:
-            print("Timed out loading page, trying again")
-        except selenium.common.exceptions.WebDriverException:
-            print("Web Driver Error, trying again")
+
 
 def create_franchises():
     url = 'https://www.pro-football-reference.com/teams/'
@@ -120,7 +104,7 @@ def create_draft_picks_for_draft(draft):
             print(draft_row)
             draft_pick = {'round': int(draft_row.find('th').text), 'pick': int(draft_row.find_all('td')[0].text),
                           'team_id': teams.get_primary_key_by_columns_search({'team_url': draft_row.find('a')['href'].replace('_draft', '')}),
-                          'player_id': players.get_primary_key_by_columns_search({'player_url', draft_row.find_all('a')[1]['href']})}
+                          'player_id': players.get_primary_key_by_columns_search({'player_url': draft_row.find_all('a')[1]['href']})}
             print(draft_row.find('a')['href'])
             print(draft_pick)
 def create_draft_picks():
@@ -165,7 +149,7 @@ if __name__ == '__main__':
         create_drafts()
     else:
         drafts.create_from_table()
-    #create_draft_picks_for_draft({'draft_url': "/years/2023/draft.htm"})
+    create_draft_picks_for_draft({'draft_url': "/years/2023/draft.htm"})
     franchises.insert_data()
     leagues.insert_data()
     league_years.insert_data()
