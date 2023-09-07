@@ -3,60 +3,17 @@ from table import Table, ObjectTable
 import sys
 from string import ascii_uppercase
 from webscraper import fetch_soup_from_page
+from franchises import Franchises
+from leagues import Leagues
+from teams import Teams
 
-franchises = Table('franchises', ['franchise_id', 'franchise_name', 'franchise_url', 'active'])
-leagues = ObjectTable('leagues', ['league_id', 'league_name'], 'league_id')
-league_years = ObjectTable('league_years', ['league_year_id', 'league_name', 'year', 'league_year_url'],
-                           'league_year_id')
+franchises = None
+leagues = None
+teams = None
 teams = ObjectTable('teams', ['franchise_id', 'year', 'team_url', 'league_year_id', 'team_id'], 'team_id')
 players = ObjectTable('players', ['player_id', 'hall_of_fame', 'active', 'player_url', 'player_name', 'position'], 'player_id')
 drafts = ObjectTable('drafts', ['year', 'league_year_id', 'draft_url', 'draft_id'], 'draft_id')
 draft_picks = ObjectTable('draft_picks', ['year', 'draft_id', 'round', 'pick', 'player_id', 'team_id', 'draft_pick_id'], 'draft_pick_id')
-
-
-def create_franchises():
-    url = 'https://www.pro-football-reference.com/teams/'
-    soup = fetch_soup_from_page(url)
-    franchise_rows = soup.find(id="div_teams_active").find_all("th")
-    franchise_id = 1
-    for franchise_row in franchise_rows:
-        if franchise_row.find("a") is not None:
-            franchise = {'franchise_name': franchise_row.text, 'franchise_url': franchise_row.find('a')['href'], 'franchise_id': franchise_id, 'active': 1}
-            franchise_id += 1
-            franchises.append(franchise)
-    franchise_rows = soup.find(id="teams_inactive").find_all("th")
-    for franchise_row in franchise_rows:
-        if franchise_row.find("a") is not None:
-            franchise = {'franchise_name': franchise_row.text, 'franchise_url': franchise_row.find('a')['href'], 'franchise_id': franchise_id, 'active': 0}
-            franchise_id += 1
-            franchises.append(franchise)
-
-def create_years():
-    soup = fetch_soup_from_page("https://www.pro-football-reference.com/years/")
-    year_rows = soup.find(id="years").find('tbody').find_all("tr")
-    league_years_array = []
-    for year_row in year_rows:
-        if year_row.find_all("th")[0].text.isnumeric():
-            year = int(year_row.find_all("th")[0].text)
-            for league_td in year_row.find_all("td")[0].find_all("a"):
-                league_year = {'league_name': league_td.text, 'year': year, 'league_year_url': league_td['href']}
-                league_years_array.append(league_year)
-    league_names = []
-    for league_year_data in league_years_array:
-        if league_year_data['league_name'] not in league_names:
-            league_names.append(league_year_data['league_name'])
-    for league_name in league_names:
-        leagues.append({'league_name': league_name})
-    for league_year in league_years_array:
-        league_id = leagues.get_primary_key_by_column_search('league_name', league_year['league_name'])
-        league_year['league_id'] = league_id
-        league_years.append(league_year)
-    return {'leagues': leagues, 'league_years': league_years}
-def remove_old_database():
-    try:
-        os.remove("/Users/administrator/Programs/football_grid_trainer/database.db")
-    except OSError:
-        print("Could not remove file")
 
 
 
@@ -128,19 +85,9 @@ if __name__ == '__main__':
     if 'all' in sys.argv:
         for key in which_dicts.keys():
             which_dicts[key] = True
-    if which_dicts['franchises']:
-        create_franchises()
-    else:
-        franchises.create_from_table()
-    if which_dicts['leagues']:
-        create_years()
-    else:
-        leagues.create_from_table()
-        league_years.create_from_table()
-    if which_dicts['teams']:
-        create_teams()
-    else:
-        teams.create_from_table()
+    franchises = Franchises(which_dicts['franchises'])
+    leagues = Leagues(which_dicts['leagues'])
+    teams = Teams(which_dicts['teams'], franchises, leagues)
     if which_dicts['players']:
         create_players()
     else:
@@ -149,10 +96,9 @@ if __name__ == '__main__':
         create_drafts()
     else:
         drafts.create_from_table()
-    create_draft_picks_for_draft({'draft_url': "/years/2023/draft.htm"})
+    # create_draft_picks_for_draft({'draft_url': "/years/2023/draft.htm"})
     franchises.insert_data()
     leagues.insert_data()
-    league_years.insert_data()
     teams.insert_data()
     players.insert_data()
     drafts.insert_data()

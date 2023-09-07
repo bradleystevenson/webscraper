@@ -12,8 +12,6 @@ class Table:
     def create_from_table(self):
         self.data = database_connection.get_database_connection().select_statement(self.table_name, self.table_columns)
 
-
-
     def append(self, new_row):
         self.data.append(new_row)
 
@@ -48,6 +46,7 @@ class Table:
             row_string = row_string[:-2] + ')'
             insert_string += row_string + ', '
         insert_string = insert_string[:-2]
+        print(insert_string)
         database_connection.get_database_connection().execute(insert_string)
 
 class ObjectTable(Table):
