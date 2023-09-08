@@ -1,0 +1,2 @@
+ticket-001: Finish the drafted players
+ticket-002: Split the positions table into its own thing, and have a join with players (properly handle multiple positions)

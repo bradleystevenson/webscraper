@@ -2,6 +2,7 @@ from bs4 import BeautifulSoup
 from selenium import webdriver
 import selenium
 
+
 def fetch_soup_from_page(url):
     while True:
         try:

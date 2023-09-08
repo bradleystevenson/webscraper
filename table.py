@@ -1,6 +1,7 @@
 import database_connection
 from database_connection import DatabaseConnection
 import sqlite3
+from exceptions import NoMatchException
 
 class Table:
 
@@ -46,7 +47,6 @@ class Table:
             row_string = row_string[:-2] + ')'
             insert_string += row_string + ', '
         insert_string = insert_string[:-2]
-        print(insert_string)
         database_connection.get_database_connection().execute(insert_string)
 
 class ObjectTable(Table):
@@ -59,20 +59,21 @@ class ObjectTable(Table):
     def append(self, new_row):
         new_row[self.primary_key] = self.max_id
         super().append(new_row)
+        return_id = self.max_id
         self.max_id += 1
+        return return_id
 
     def get_primary_key_by_column_search(self, column_name, column_value):
         for row in self.data:
             if row[column_name] == column_value:
                 return row[self.primary_key]
-        raise Exception("No match for column value")
+        raise NoMatchException("No match for column value")
 
     def get_primary_key_by_columns_search(self, search_dict):
         for row in self.data:
             if self._is_match(row, search_dict):
                 return row[self.primary_key]
-        print(search_dict)
-        raise Exception("No Match for " + str(search_dict))
+        raise NoMatchException("No Match for " + str(search_dict))
 
 
     def _is_match(self, row, search_dict):

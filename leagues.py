@@ -1,23 +1,15 @@
 from table import ObjectTable
 from webscraper import fetch_soup_from_page
+from object import Object
 
-
-class Leagues:
+class Leagues(Object):
 
 
     def __init__(self, create_from_web):
         self.leagues = ObjectTable('leagues', ['league_id', 'league_name'], 'league_id')
         self.league_years = ObjectTable('league_years', ['league_year_id', 'league_name', 'year', 'league_year_url'],
                                    'league_year_id')
-        if create_from_web:
-            self._create_from_web()
-        else:
-            self.leagues.create_from_table()
-            self.league_years.create_from_table()
-
-    def insert_data(self):
-        self.leagues.insert_data()
-        self.league_years.insert_data()
+        super().__init__(create_from_web, [self.leagues, self.league_years])
 
     def _create_from_web(self):
         soup = fetch_soup_from_page("https://www.pro-football-reference.com/years/")
