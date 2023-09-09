@@ -1,2 +1,7 @@
-ticket-001: Finish the drafted players
-ticket-002: Split the positions table into its own thing, and have a join with players (properly handle multiple positions)
+ticket-001: Finish the drafted players (CHECK)
+ticket-002: Split the positions table into its own thing, and have a join with players (properly handle multiple positions) (CHECK)
+ticket-003: Create the games in a season
+ticket-004: Create the awards from a season
+ticket-005: Create all the trades for draft picks
+ticket-006: Create all the transactions in a season
+
