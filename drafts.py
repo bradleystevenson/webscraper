@@ -12,10 +12,11 @@ class Drafts(Object):
     def __init__(self, create_from_web, leagues, teams, players):
         self.drafts_table = ObjectTable('drafts', ['year', 'league_year_id', 'draft_url', 'draft_id'], 'draft_id')
         self.draft_picks_table = ObjectTable('draft_picks', ['year', 'draft_id', 'round', 'pick', 'player_id', 'team_id', 'draft_pick_id'], 'draft_pick_id')
+        self.draft_transactions_table = ObjectTable('draft_transactions', ['draft_transaction_id', 'draft_id', 'transaction_date', 'transaction_string'], 'draft_transaction_id')
         self.teams = teams
         self.players = players
         self.leagues = leagues
-        super().__init__(create_from_web, [self.drafts_table])
+        super().__init__(create_from_web, [self.drafts_table, self.draft_picks_table, self.draft_transactions_table])
 
     def _create_from_web(self):
         soup = fetch_soup_from_page("https://www.pro-football-reference.com/draft/")
@@ -37,3 +38,9 @@ class Drafts(Object):
             except NoMatchException:
                 data_dict['player_id'] = self.players.create_player(data_dict['player_url'], data_dict['position'])
             self.draft_picks_table.append(data_dict['player_id'])
+        transactions = soup.find(id='div_transactions')
+        data_dict_from_object = DataDictFromObject({'transaction_date': get_bold_text, 'transaction_string': get_text_after_colon})
+        for p in transactions.find_all('p'):
+            draft_transaction_dict = data_dict_from_object.parse(p)
+            draft_transaction_dict['draft_id'] = draft['draft_id']
+            self.draft_transactions_table.append(draft_transaction_dict)

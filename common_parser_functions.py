@@ -26,6 +26,12 @@ def get_third_td_text(html_object):
 def get_text_in_parantheses(html_object):
     return html_object.text.split('(')[1].split(')')[0]
 
+def get_bold_text(html_object):
+    return html_object.find("b").text
+
+def get_text_after_colon(html_object):
+    return html_object.text.split(':')[1]
+
 def does_html_object_contain_bold(html_object):
     if html_object.find("b") is not None:
         return 1
