@@ -11,12 +11,11 @@ class Drafts(Object):
 
     def __init__(self, create_from_web, leagues, teams, players):
         self.drafts_table = ObjectTable('drafts', ['year', 'league_year_id', 'draft_url', 'draft_id'], 'draft_id')
-        # self.draft_picks_table = ObjectTable('draft_picks', ['year', 'draft_id', 'round', 'pick', 'player_id', 'team_id', 'draft_pick_id'], 'draft_pick_id')
+        self.draft_picks_table = ObjectTable('draft_picks', ['year', 'draft_id', 'round', 'pick', 'player_id', 'team_id', 'draft_pick_id'], 'draft_pick_id')
         self.teams = teams
         self.players = players
         self.leagues = leagues
         super().__init__(create_from_web, [self.drafts_table])
-        self._create_draft_picks_for_draft({'draft_url': "/years/2023/draft.htm"})
 
     def _create_from_web(self):
         soup = fetch_soup_from_page("https://www.pro-football-reference.com/draft/")
@@ -25,6 +24,8 @@ class Drafts(Object):
             data_dict['year'] = int(data_dict['year'])
             data_dict['league_year_id'] = self.leagues.league_years.get_primary_key_by_columns_search({'year': data_dict['year'], 'league_name': data_dict['league_name']})
             self.drafts_table.append(data_dict)
+        for draft_data in self.drafts_table.data:
+            self._create_draft_picks_for_draft(draft_data)
 
     def _create_draft_picks_for_draft(self, draft):
         soup = fetch_soup_from_page("https://www.pro-football-reference.com/" + draft['draft_url'])
@@ -34,4 +35,5 @@ class Drafts(Object):
             try:
                 data_dict['player_id'] = self.players.players_table.get_primary_key_by_columns_search({'player_url': data_dict['player_url']})
             except NoMatchException:
-                self.players.create_player(data_dict['player_url'], data_dict['position'])
+                data_dict['player_id'] = self.players.create_player(data_dict['player_url'], data_dict['position'])
+            self.draft_picks_table.append(data_dict['player_id'])

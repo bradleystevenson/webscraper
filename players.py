@@ -25,5 +25,5 @@ class Players(Object):
 
     def create_player(self, player_url, player_position):
         soup = fetch_soup_from_page(f'https://www.pro-football-reference.com{player_url}')
-        print(soup)
         data_dict = {'player_url': player_url, 'player_name': soup.find("h1").text, 'position': player_position, 'hall_of_fame': 0, 'active': 0}
+        return self.players_table.append(data_dict)
