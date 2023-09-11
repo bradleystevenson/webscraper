@@ -85,3 +85,4 @@ class Games(Object):
                              'away_team_name': away_team_name,
                              'league_year_id': league_dict['league_year_id'],
                              'boxscore_url': boxscore_url}
+                self.games_table.append(game_dict)
