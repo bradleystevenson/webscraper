@@ -18,27 +18,17 @@ def get_text_of_element_at_index(element, index):
     return get_text_of_element
 
 
-def get_text_of_element_with_attribute(attribute, value):
-    def return_function(html_object):
-        return get_element_with_attribute(attribute, value)(html_object).text
-    return return_function
-
-
 def get_text_of_element_with_attributes(attributes):
     def return_function(html_object):
         return get_element_with_attributes(attributes)(html_object).text
     return return_function
+
 
 def get_element_with_attributes(attributes):
     def return_function(html_object):
         return html_object.find(attrs=attributes)
     return return_function
 
-
-def get_element_with_attribute(attribute, value):
-    def return_function(html_object):
-        return html_object.find(attrs={attribute : value})
-    return return_function
 
 def get_text_in_parentheses(html_object):
     return html_object.text.split('(')[1].split(')')[0]
@@ -53,6 +43,9 @@ def does_tr_have_thead_class(html_object):
 def does_tr_not_have_thead_class(html_object):
     return does_tr_have_thead_class(html_object) == False
 
+
+def does_element_not_have_strong_and_does_tr_not_have_thead_class(html_object):
+    return does_tr_not_have_thead_class(html_object) and html_object.find("strong") is None
 
 def does_html_object_contain_bold(html_object):
     if html_object.find("b") is not None:
