@@ -16,9 +16,10 @@ class Franchises(Object):
         url = 'https://www.pro-football-reference.com/teams/'
         soup = fetch_soup_from_page(url)
         table_parser = TableParser(soup.find(id="teams_active"), row_has_link, DataDictFromObject(
-            {'franchise_name': first_link_text, 'franchise_url': first_link_url, 'active': one}))
+            {'franchise_name': get_text_of_element_at_index("a", 0), 'franchise_url': get_url_of_element_at_index("a", 0), 'active': one}))
         for franchise_row in table_parser.data:
             self.franchises_table.append(franchise_row)
-        table_parser = TableParser(soup.find(id="teams_inactive"), row_has_link, DataDictFromObject({'franchise_name': first_link_text, 'franchise_url': first_link_url, 'active': zero}))
+        table_parser = TableParser(soup.find(id="teams_inactive"), row_has_link, DataDictFromObject(
+            {'franchise_name': get_text_of_element_at_index("a", 0), 'franchise_url': get_url_of_element_at_index("a", 0), 'active': zero}))
         for franchise_row in table_parser.data:
             self.franchises_table.append(franchise_row)

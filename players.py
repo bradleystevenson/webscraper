@@ -13,8 +13,8 @@ class Players(Object):
 
 
     def _create_from_web(self):
-        data_dict_from_object = DataDictFromObject({'player_url': first_link_url, 'player_name': first_link_text,
-                                                    'position': get_text_in_parantheses,
+        data_dict_from_object = DataDictFromObject({'player_url': get_url_of_element_at_index("a", 0), 'player_name': get_text_of_element_at_index("a", 0),
+                                                    'position': get_text_in_parentheses,
                                                     'active': does_html_object_contain_bold,
                                                     'hall_of_fame': is_plus_in_html_object_text})
         for letter in ascii_uppercase:

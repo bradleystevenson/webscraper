@@ -20,7 +20,7 @@ class Drafts(Object):
 
     def _create_from_web(self):
         soup = fetch_soup_from_page("https://www.pro-football-reference.com/draft/")
-        table_parser = TableParser(soup.find(id="draft_years"), row_has_link, DataDictFromObject({'draft_url': first_link_url, 'year': first_link_text, 'league_name': first_td_text}))
+        table_parser = TableParser(soup.find(id="draft_years"), row_has_link, DataDictFromObject({'draft_url': get_url_of_element_at_index("a", 0), 'year': get_text_of_element_at_index("a", 0), 'league_name': get_text_of_element_at_index("td", 0)}))
         for data_dict in table_parser.data:
             data_dict['year'] = int(data_dict['year'])
             data_dict['league_year_id'] = self.leagues.league_years.get_primary_key_by_columns_search({'year': data_dict['year'], 'league_name': data_dict['league_name']})
@@ -30,7 +30,7 @@ class Drafts(Object):
 
     def _create_draft_picks_for_draft(self, draft):
         soup = fetch_soup_from_page("https://www.pro-football-reference.com/" + draft['draft_url'])
-        table_parser = TableParser(soup.find(id="drafts"), is_header_numeric, DataDictFromObject({'round': get_first_th_text, 'team_url': first_link_url, 'pick': first_td_text, 'player_url': get_second_link_url, 'position': get_third_td_text}))
+        table_parser = TableParser(soup.find(id="drafts"), is_header_numeric, DataDictFromObject({'round': get_text_of_element_at_index("th", 0), 'team_url': get_url_of_element_at_index("a", 0), 'pick': get_text_of_element_at_index("td", 0), 'player_url': get_url_of_element_at_index("a", 1), 'position': get_text_of_element_at_index("td", 2)}))
         for data_dict in table_parser.data:
             data_dict['team_id'] = self.teams.teams_table.get_primary_key_by_columns_search({'team_url': data_dict['team_url'].replace('_draft', '')})
             try:
@@ -39,7 +39,7 @@ class Drafts(Object):
                 data_dict['player_id'] = self.players.create_player(data_dict['player_url'], data_dict['position'])
             self.draft_picks_table.append(data_dict['player_id'])
         transactions = soup.find(id='div_transactions')
-        data_dict_from_object = DataDictFromObject({'transaction_date': get_bold_text, 'transaction_string': get_text_after_colon})
+        data_dict_from_object = DataDictFromObject({'transaction_date': get_text_of_element_at_index("b", 0), 'transaction_string': get_text_after_colon})
         for p in transactions.find_all('p'):
             draft_transaction_dict = data_dict_from_object.parse(p)
             draft_transaction_dict['draft_id'] = draft['draft_id']
