@@ -11,12 +11,16 @@ def get_url_of_element_at_index(element, index):
         return html_object.find_all(element)[index]['href']
     return get_url_of_element
 
-
 def get_text_of_element_at_index(element, index):
     def get_text_of_element(html_object):
         return html_object.find_all(element)[index].text
     return get_text_of_element
 
+
+def get_url_of_element_with_attributes(attributes):
+    def return_function(html_object):
+        return get_element_with_attributes(attributes)(html_object).find("a")['href']
+    return return_function
 
 def get_text_of_element_with_attributes(attributes):
     def return_function(html_object):

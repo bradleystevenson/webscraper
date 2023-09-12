@@ -26,3 +26,7 @@ class Awards(Object):
             hall_of_fame_dict = {'player_id': self.players.players_table.get_primary_key_by_columns_search({'player_url': data_dict['player'].find("a")['href']}),
                                  'year_inducted': data_dict['year_inducted'], 'position': data_dict['position']}
             self.hall_of_fame_players_table.append(hall_of_fame_dict)
+        table_parser = TableParser(soup.find(id="hof_players"), row_has_link, DataDictFromObject({'player': get_element_with_attributes({'data-stat': 'player'}),
+                                                                                                  'position': get_text_of_element_with_attributes({'data-stat': 'pos'}),
+                                                                                                  'year_inducted': get_text_of_element_with_attributes({'data-stat': 'year_induction'})}))
+

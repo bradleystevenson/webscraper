@@ -63,6 +63,10 @@ class ObjectTable(Table):
         self.max_id += 1
         return return_id
 
+    def extend(self, new_rows):
+        for new_role in new_rows:
+            self.append(new_role)
+
     def get_primary_key_by_column_search(self, column_name, column_value):
         for row in self.data:
             if row[column_name] == column_value:
