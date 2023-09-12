@@ -7,10 +7,11 @@ from drafts import Drafts
 from games import Games
 from awards import Awards
 from coaches import Coaches
+from executives import Executives
 
 if __name__ == '__main__':
     which_dicts = {'franchises': False, 'leagues': False, 'teams': False, 'players': False, 'drafts': False, 'games': False,
-                   'awards': False, 'coaches': False}
+                   'awards': False, 'coaches': False, 'executives': False}
     for argument in sys.argv:
         which_dicts[argument] = True
     if 'all' in sys.argv:
@@ -23,7 +24,8 @@ if __name__ == '__main__':
     drafts = Drafts(which_dicts['drafts'], leagues, teams, players)
     #games = Games(which_dicts['games'], leagues, teams)
     coaches = Coaches(which_dicts['coaches'])
-    awards = Awards(which_dicts['awards'], players, coaches)
+    executives = Executives(which_dicts['executives'])
+    #awards = Awards(which_dicts['awards'], players, coaches)
     franchises.insert_data()
     leagues.insert_data()
     teams.insert_data()
@@ -31,4 +33,4 @@ if __name__ == '__main__':
     drafts.insert_data()
     #games.insert_data()
     coaches.insert_data()
-    awards.insert_data()
+    #awards.insert_data()
