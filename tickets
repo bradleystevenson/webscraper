@@ -10,4 +10,5 @@ ticket-009: Create the players that played for teams
 ticket-010: Create the boxscores of games
 ticket-011: Remove hall of fame from the players parsing
 ticket-012: Create the coaches (CHECK)
-ticket-013: Create the executives
+ticket-013: Create the executives (CHECK)
+ticket-014: Remove the + from the coaches

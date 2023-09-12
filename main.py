@@ -17,20 +17,16 @@ if __name__ == '__main__':
     if 'all' in sys.argv:
         for key in which_dicts.keys():
             which_dicts[key] = True
-    franchises = Franchises(which_dicts['franchises'])
-    leagues = Leagues(which_dicts['leagues'])
-    teams = Teams(which_dicts['teams'], franchises, leagues)
-    players = Players(which_dicts['players'])
-    drafts = Drafts(which_dicts['drafts'], leagues, teams, players)
+    objects = {'franchises': Franchises(which_dicts['franchises']),
+               'leagues': Leagues(which_dicts['leagues']),
+               'players': Players(which_dicts['players']),
+               'coaches': Coaches(which_dicts['coaches']),
+               'executives': Executives(which_dicts['executives'])
+               }
+    objects['teams'] = Teams(which_dicts['teams'], objects['franchises'], objects['leagues'])
+    objects['drafts'] = Drafts(which_dicts['drafts'], objects['leagues'], objects['teams'], objects['players'])
+    objects['awards'] = Awards(which_dicts['awards'], objects['players'], objects['coaches'], objects['executives'])
     #games = Games(which_dicts['games'], leagues, teams)
-    coaches = Coaches(which_dicts['coaches'])
-    executives = Executives(which_dicts['executives'])
-    awards = Awards(which_dicts['awards'], players, coaches)
-    franchises.insert_data()
-    leagues.insert_data()
-    teams.insert_data()
-    players.insert_data()
-    drafts.insert_data()
-    #games.insert_data()
-    coaches.insert_data()
-    awards.insert_data()
+    #awards = Awards(which_dicts['awards'], players, coaches)
+    for key in objects.keys():
+        objects[key].insert_data()

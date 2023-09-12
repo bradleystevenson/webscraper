@@ -12,7 +12,7 @@ class Executives(Object):
         super().__init__(create_from_web, [self.executives_table])
 
     def _create_from_web(self):
-        table_parser = TableParser(fetch_soup_from_page("https://www.pro-football-reference.com/executives/").find(id="executives"), is_header_numeric,
+        table_parser = TableParser(fetch_soup_from_page("https://www.pro-football-reference.com/executives/").find(id="executives"), row_has_link,
                                    DataDictFromObject({'name': get_text_of_element_with_attributes({'data-stat': 'exec'}),
                                                        'executive_url': get_url_of_element_with_attributes({'data-stat': 'exec'})}))
         self.executives_table.extend(table_parser.data)
