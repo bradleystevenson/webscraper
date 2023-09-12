@@ -16,6 +16,9 @@ class Table:
     def append(self, new_row):
         self.data.append(new_row)
 
+    def extend(self, new_rows):
+        self.data.extend(new_rows)
+
     def create_table(self):
         execution_string = 'CREATE TABLE ' + self.table_name + ' ('
         for table_column in self.table_columns:

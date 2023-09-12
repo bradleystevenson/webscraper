@@ -16,7 +16,7 @@ class Coaches(Object):
     def _create_from_web(self):
         soup = fetch_soup_from_page("https://www.pro-football-reference.com/coaches/")
         table_parser = TableParser(soup.find(id="coaches"), is_header_numeric, DataDictFromObject({'coach_url': get_url_of_element_with_attributes({'data-stat': 'coach'}),
-                                                                                                   'coach_name': get_text_of_element_with_attributes({'data-stat': 'coach'}),
+                                                                                                   'name': get_text_of_element_with_attributes({'data-stat': 'coach'}),
                                                                                                    'active': does_html_object_contain_bold,
                                                                                                    'start_year': get_text_of_element_with_attributes({'data-stat': 'year_min'}),
                                                                                                    'end_year': get_text_of_element_with_attributes({'data-stat': 'year_max'})}))
