@@ -18,16 +18,18 @@ class Awards(Object):
         self.hall_of_fame_ballots_table = Table('hall_of_fame_ballots', ['year', 'ballot', 'role', 'name', 'coach_id', 'player_id', 'executive_id', 'inducted'])
         self.top_100_players_table = Table('top_100_players', ['year', 'player_id'])
         self.all_pro_awards_table = ObjectTable('all_pro_awards', ['all_pro_award_id', 'award_name'], 'all_pro_award_id')
+        self.all_pro_players_table = Table('all_pro_players', ['player_id', 'team_tier', 'all_pro_award_id', 'year', 'position'])
         super().__init__(create_from_web, [self.hall_of_fame_players_table, self.hall_of_fame_coaches_table, self.hall_of_fame_contributors_table,
-                                           self.hall_of_fame_ballots_table, self.top_100_players_table])
+                                           self.hall_of_fame_ballots_table, self.top_100_players_table, self.all_pro_awards_table,
+                                           self.all_pro_players_table])
 
     def _create_from_web(self):
         #self._create_hall_of_fame()
         links = self._create_links()
         #self._create_top_100(links['top_100_players'])
         #self._create_hall_of_fame_ballots(links['hall_of_fame_ballots'])
-        self._create_nfl_all_pros([{'url': '/years/2022/allpro.htm'}])
-
+        #self._create_nfl_all_pros(links['all_pros'])
+        
 
     def _create_nfl_all_pros(self, links):
         for link in links:
@@ -37,11 +39,16 @@ class Awards(Object):
                                                                          'all_pros': get_text_of_element_with_attributes({'data-stat': 'all_pro_string'})}))
             for data_dict in table_parser.data:
                 for all_pro in data_dict['all_pros'].split(', '):
+                    print(all_pro)
+                    all_pro_name = all_pro.split(':')[0]
+                    team_tier = all_pro.split(':')[1]
                     try:
-                        self.all_pro_awards_table.get_primary_key_by_columns_search({'award_name': all_pro})
+                        all_pro_award_id = self.all_pro_awards_table.get_primary_key_by_columns_search({'award_name': all_pro_name})
                     except NoMatchException:
-                        self.all_pro_awards_table.append({'award_name': all_pro})
-
+                        all_pro_award_id = self.all_pro_awards_table.append({'award_name': all_pro_name})
+                    self.all_pro_players_table.append({'all_pro_award_id': all_pro_award_id, 'team_tier': team_tier, 'year': link['year'],
+                                                       'player_id': self.players.players_table.get_primary_key_by_columns_search({'player_url': data_dict['player_url']}),
+                                                       'position': data_dict['position']})
 
 
     def _create_top_100(self, links):
@@ -77,7 +84,6 @@ class Awards(Object):
             return_dict['defunct_awards'].append({'url': p.find('a')['href'], 'award_name': p.find('a').text, 'leagues': p.find('span').text.split(', ')[0].split(',')})
         for p in soup.find(text="Pro Football Awards").parent.parent.find_all("p"):
             return_dict['awards'].append({'url': p.find('a')['href'], 'award_name': p.text})
-        print(return_dict)
         return return_dict
 
 
