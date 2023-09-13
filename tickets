@@ -12,3 +12,5 @@ ticket-011: Remove hall of fame from the players parsing
 ticket-012: Create the coaches (CHECK)
 ticket-013: Create the executives (CHECK)
 ticket-014: Remove the + from the coaches
+ticket-015: From a team, get the roster
+ticket-016: Get the retired number of a franchise
