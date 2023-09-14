@@ -19,9 +19,12 @@ class Awards(Object):
         self.top_100_players_table = Table('top_100_players', ['year', 'player_id'])
         self.all_pro_awards_table = ObjectTable('all_pro_awards', ['all_pro_award_id', 'award_name'], 'all_pro_award_id')
         self.all_pro_players_table = Table('all_pro_players', ['player_id', 'team_tier', 'all_pro_award_id', 'year', 'position'])
+        self.other_all_pro_players_table = Table('other_all_pro_players', ['player_id', 'team_tier', 'all_pro_award_id', 'year', 'position', 'league'])
+        self.awards_table = ObjectTable('awards', ['award_name', 'award_id'], 'award_id')
+        self.awards_voting_summary_table = Table('awards_voting_summary', ['award_id', 'year', 'player_id', 'coach_id', 'position', 'vote_points', 'first_place_votes', 'share'])
         super().__init__(create_from_web, [self.hall_of_fame_players_table, self.hall_of_fame_coaches_table, self.hall_of_fame_contributors_table,
                                            self.hall_of_fame_ballots_table, self.top_100_players_table, self.all_pro_awards_table,
-                                           self.all_pro_players_table])
+                                           self.all_pro_players_table, self.other_all_pro_players_table])
 
     def _create_from_web(self):
         #self._create_hall_of_fame()
@@ -29,7 +32,32 @@ class Awards(Object):
         #self._create_top_100(links['top_100_players'])
         #self._create_hall_of_fame_ballots(links['hall_of_fame_ballots'])
         #self._create_nfl_all_pros(links['all_pros'])
-        
+        #self._create_other_all_pros(links['other_all_pros'])
+        self._create_voting_summaries([{'url': '/awards/awards_2022.htm', 'year': '2022'}])
+
+
+
+    def _create_voting_summaries(self, links):
+        for link in links:
+            print(link)
+
+    def _create_other_all_pros(self, links):
+        for link in links:
+            table_parser = TableParser(fetch_soup_from_page(f'https://www.pro-football-reference.com{link["url"]}').find(id="all_pro"),
+                                       row_has_link, DataDictFromObject({'position': get_text_of_element_with_attributes({'data-stat': 'pos'}),
+                                                                         'player_url': get_url_of_element_with_attributes({'data-stat': 'player'}),
+                                                                         'all_pros': get_text_of_element_with_attributes({'data-stat': 'all_pro_string'})}))
+            for data_dict in table_parser.data:
+                for all_pro in data_dict['all_pros'].split(', '):
+                    all_pro_name = all_pro.split(':')[0]
+                    team_tier = all_pro.split(':')[1]
+                    try:
+                        all_pro_award_id = self.all_pro_awards_table.get_primary_key_by_columns_search({'award_name': all_pro_name})
+                    except NoMatchException:
+                        all_pro_award_id = self.all_pro_awards_table.append({'award_name': all_pro_name})
+                    self.all_pro_players_table.append({'all_pro_award_id': all_pro_award_id, 'team_tier': team_tier, 'year': link['year'],
+                                                       'player_id': self.players.players_table.get_primary_key_by_columns_search({'player_url': data_dict['player_url']}),
+                                                       'position': data_dict['position'], 'league': link['league']})
 
     def _create_nfl_all_pros(self, links):
         for link in links:
