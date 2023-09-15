@@ -25,8 +25,7 @@ if __name__ == '__main__':
                }
     objects['teams'] = Teams(which_dicts['teams'], objects['franchises'], objects['leagues'])
     objects['drafts'] = Drafts(which_dicts['drafts'], objects['leagues'], objects['teams'], objects['players'])
-    objects['awards'] = Awards(which_dicts['awards'], objects['players'], objects['coaches'], objects['executives'])
+    #objects['awards'] = Awards(which_dicts['awards'], objects['players'], objects['coaches'], objects['executives'])
     #games = Games(which_dicts['games'], leagues, teams)
-    #awards = Awards(which_dicts['awards'], players, coaches)
     for key in objects.keys():
         objects[key].insert_data()
