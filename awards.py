@@ -1,3 +1,4 @@
+import webscraper
 from object import Object
 from table import Table, ObjectTable, NoMatchException
 from webscraper import fetch_soup_from_page
@@ -21,25 +22,230 @@ class Awards(Object):
         self.all_pro_players_table = Table('all_pro_players', ['player_id', 'team_tier', 'all_pro_award_id', 'year', 'position'])
         self.other_all_pro_players_table = Table('other_all_pro_players', ['player_id', 'team_tier', 'all_pro_award_id', 'year', 'position', 'league'])
         self.awards_table = ObjectTable('awards', ['award_name', 'award_id'], 'award_id')
-        self.awards_voting_summary_table = Table('awards_voting_summary', ['award_id', 'year', 'player_id', 'coach_id', 'position', 'vote_points', 'first_place_votes', 'share'])
+        self.awards_voting_summary_table = Table('awards_voting_summary', ['award_id', 'year', 'player_id', 'coach_id', 'vote_points', 'first_place_votes', 'share'])
+        self.all_decade_teams_table = ObjectTable('all_decade_teams', ['all_decade_team_name', 'all_decade_team_id'], 'all_decade_team_id')
+        self.all_decade_team_players_table = Table('all_decade_team_players', ['all_decade_team_id', 'year', 'position', 'player_id'])
+        self.all_rookie_teams_table = Table('all_rookie_teams', ['player_id', 'position', 'year'])
+        self.player_of_the_weeks_table = Table('player_of_the_weeks', ['player_id', 'year', 'month', 'conference', 'unit'])
+        self.player_of_the_months_table = Table('player_of_the_months', ['player_id', 'year', 'month', 'unit'])
+        self.rookie_of_the_months_table = Table('player_of_the_months', ['player_id', 'year', 'month', 'unit'])
+        self.players_of_the_week_table = Table('players_of_the_week', ['player_id', 'year', 'week', 'unit', 'text'])
         super().__init__(create_from_web, [self.hall_of_fame_players_table, self.hall_of_fame_coaches_table, self.hall_of_fame_contributors_table,
                                            self.hall_of_fame_ballots_table, self.top_100_players_table, self.all_pro_awards_table,
-                                           self.all_pro_players_table, self.other_all_pro_players_table])
+                                           self.all_pro_players_table, self.other_all_pro_players_table,
+                                           self.awards_table, self.awards_voting_summary_table,
+                                           self.all_decade_teams_table, self.all_decade_team_players_table,
+                                           self.all_rookie_teams_table])
 
     def _create_from_web(self):
-        #self._create_hall_of_fame()
-        links = self._create_links()
-        #self._create_top_100(links['top_100_players'])
-        #self._create_hall_of_fame_ballots(links['hall_of_fame_ballots'])
-        #self._create_nfl_all_pros(links['all_pros'])
-        #self._create_other_all_pros(links['other_all_pros'])
-        self._create_voting_summaries([{'url': '/awards/awards_2022.htm', 'year': '2022'}])
+        # self._create_hall_of_fame()
+        # links = self._create_links()
+        # self._create_players_of_the_week()
+        # self._create_top_100(links['top_100_players'])
+        # self._create_hall_of_fame_ballots(links['hall_of_fame_ballots'])
+        # self._create_nfl_all_pros(links['all_pros'])
+        # self._create_other_all_pros(links['other_all_pros'])
+        # self._create_voting_summaries(links['voting_summaries'])
+        # self._create_all_decade_teams(links['all_decade_teams'])
+        # self._create_all_rookie_teams([{'year': '2022', 'url': '/awards/nfl-all-rookie-2022.htm'}])
+        # self._create_rookies_of_the_month()
+        self._create_players_of_the_week()
+        pass
+
+    def _create_players_of_the_week(self):
+        soup = fetch_soup_from_page('https://www.pro-football-reference.com/awards/players-of-the-week.htm')
+        table_parser = TableParser(soup.find(id="nfl_potw"), is_header_numeric,
+                                   DataDictFromObject({'year': get_text_of_element_with_attributes({'data-stat': 'year_id'}),
+                                                       'week': get_text_of_element_with_attributes({'data-stat': 'week_num'}),
+                                                       'afc_offensive_player': get_element_with_attributes({'data-stat': 'afc_offense'}),
+                                                       'afc_defensive_player': get_element_with_attributes({'data-stat': 'afc_defense'}),
+                                                       'afc_special_teams_player': get_element_with_attributes({'data-stat': 'afc_st'}),
+                                                       'nfc_offensive_player': get_element_with_attributes({'data-stat': 'nfc_offense'}),
+                                                       'nfc_defensive_player': get_element_with_attributes({'data-stat': 'nfc_defense'}),
+                                                       'nfc_special_teams_player': get_element_with_attributes({'data-stat': 'nfc_st'})
+                                                       }))
+        for data_dict in table_parser.data:
+            if data_dict['afc_offensive_player'].find('a') is not None:
+                try:
+                    self.players_of_the_week_table.append({
+                                                       'player_id': self.players.players_table.get_primary_key_by_columns_search(
+                                                           {'player_url': data_dict['afc_offensive_player'].find("a")[
+                                                               'href']}),
+                                                       'year': data_dict['year'], 'week': data_dict['week'],
+                                                       'conference': 'AFC', 'unit': 'Offense', 'text': ''})
+                except NoMatchException:
+                    print("No match for url" + data_dict['afc_offensive_player'].find("a")['href'])
+            else:
+                self.players_of_the_week_table.append({
+                    'player_id': -1,
+                    'year': data_dict['year'], 'week': data_dict['week'],
+                    'conference': 'AFC', 'unit': 'Offense', 'text': data_dict['afc_offensive_player'].text})
+            if data_dict['afc_defensive_player'].find('a') is not None:
+                try:
+                    self.players_of_the_week_table.append({
+                                                       'player_id': self.players.players_table.get_primary_key_by_columns_search(
+                                                           {'player_url': data_dict['afc_defensive_player'].find("a")[
+                                                               'href']}),
+                                                       'year': data_dict['year'], 'week': data_dict['week'],
+                                                       'conference': 'AFC', 'unit': 'Defense', 'text': ''})
+                except NoMatchException:
+                    print("No match for " + data_dict['afc_defensive_player'].find('a')['href'])
+            else:
+                self.players_of_the_week_table.append({
+                    'player_id': -1,
+                    'year': data_dict['year'], 'week': data_dict['week'],
+                    'conference': 'AFC', 'unit': 'Defense', 'text': data_dict['afc_defensive_player'].text})
+
+            if data_dict['nfc_offensive_player'].find('a') is not None:
+                try:
+                    self.players_of_the_week_table.append({
+                                                           'player_id': self.players.players_table.get_primary_key_by_columns_search(
+                                                           {'player_url': data_dict['nfc_offensive_player'].find("a")[
+                                                               'href']}),
+                                                       'year': data_dict['year'], 'week': data_dict['week'],
+                                                       'conference': 'NFC', 'unit': 'Offense', 'text': ''})
+                except NoMatchException:
+                    print("Player URL doesnt exist")
+            else:
+                self.players_of_the_week_table.append({
+                    'player_id': -1,
+                    'year': data_dict['year'], 'week': data_dict['week'],
+                    'conference': 'NFC', 'unit': 'Offense', 'text': data_dict['nfc_offensive_player'].text})
+
+            if data_dict['nfc_defensive_player'].find('a') is not None:
+                try:
+                    self.players_of_the_week_table.append({
+                                                       'player_id': self.players.players_table.get_primary_key_by_columns_search(
+                                                           {'player_url': data_dict['nfc_defensive_player'].find("a")[
+                                                               'href']}),
+                                                       'year': data_dict['year'], 'week': data_dict['week'],
+                                                       'conference': 'NFC', 'unit': 'Defense', 'text': ''})
+                except NoMatchException:
+                    print("no match exception")
+            else:
+                self.players_of_the_week_table.append({
+                    'player_id': -1,
+                    'year': data_dict['year'], 'week': data_dict['week'],
+                    'conference': 'NFC', 'unit': 'Defense', 'text': data_dict['nfc_defensive_player'].text})
+            if data_dict['afc_special_teams_player'] is not None:
+                try:
+                    self.players_of_the_week_table.append({
+                                                           'player_id': self.players.players_table.get_primary_key_by_columns_search(
+                                                               {'player_url':
+                                                                    data_dict['afc_special_teams_player'].find("a")[
+                                                                        'href']}),
+                                                           'year': data_dict['year'], 'week': data_dict['week'],
+                                                           'conference': 'AFC', 'unit': 'Special Teams'})
+                except NoMatchException:
+                    print("No match exception")
+            if data_dict['nfc_special_teams_player'] is not None:
+                try:
+                    self.players_of_the_week_table.append({
+                                                           'player_id': self.players.players_table.get_primary_key_by_columns_search(
+                                                               {'player_url':
+                                                                    data_dict['nfc_special_teams_player'].find("a")[
+                                                                        'href']}),
+                                                           'year': data_dict['year'], 'week': data_dict['week'],
+                                                           'conference': 'NFC', 'unit': 'Special Teams'})
+                except NoMatchException:
+                    print("No match exception")
+    def _create_rookies_of_the_month(self):
+        table_parser = TableParser(fetch_soup_from_page('https://www.pro-football-reference.com/awards/rookies-of-the-month.htm').find(id="potm_rookie"), is_header_numeric,
+                                   DataDictFromObject({'year': get_text_of_element_with_attributes({'data-stat': 'year_id'}),
+                                                       'month': get_text_of_element_with_attributes({'data-stat': 'month_num'}),
+                                                       'offensive_player_url': get_url_of_element_with_attributes({'data-stat': 'off'}),
+                                                       'defensive_player_url': get_url_of_element_with_attributes({'data-stat': 'def'})}))
+        for data_dict in table_parser.data:
+            self.rookie_of_the_months_table.append({'year': data_dict['year'], 'month': data_dict['month'],
+                                                    'unit': 'Offense',
+                                                    'player_id': self.players.players_table.get_primary_key_by_columns_search({'player_url': data_dict['offensive_player_url']})})
+            self.rookie_of_the_months_table.append({'year': data_dict['year'], 'month': data_dict['month'],
+                                                    'unit': 'Defense',
+                                                    'player_id': self.players.players_table.get_primary_key_by_columns_search({'player_url': data_dict['defensive_player_url']})})
 
 
+    def _create_players_of_the_month(self):
+        table_parser = TableParser(fetch_soup_from_page('https://www.pro-football-reference.com/awards/players-of-the-month.htm').find(id="potm"), row_has_link,
+                                                        DataDictFromObject({'year': get_text_of_element_with_attributes({'data-stat': 'year_id'}),
+                                                                            'month': get_text_of_element_with_attributes({'data-stat': 'month_num'}),
+                                                                            'afc_offensive_player': get_element_with_attributes({'data-stat': 'afc_off'}),
+                                                                            'afc_defensive_player': get_element_with_attributes({'data-stat': 'afc_def'}),
+                                                                            'afc_special_teams_player': get_element_with_attributes({'data-stat': 'afc_st'}),
+                                                                            'nfc_offensive_player': get_element_with_attributes({'data-stat': 'nfc_off'}),
+                                                                            'nfc_defensive_player': get_element_with_attributes({'data-stat': 'nfc_def'}),
+                                                                            'nfc_special_teams_player': get_element_with_attributes({'data-stat': 'nfc_st'})
+                                                                            }))
+        for data_dict in table_parser.data:
+            self.player_of_the_months_table.append({'player_id': self.players.players_table.get_primary_key_by_columns_search({'player_url': data_dict['afc_offensive_player'].find("a")['href']}),
+                                                   'year': data_dict['year'], 'month': data_dict['month'],
+                                                   'conference': 'AFC', 'unit': 'Offense'})
+            self.player_of_the_months_table.append({'player_id': self.players.players_table.get_primary_key_by_columns_search({'player_url': data_dict['afc_defensive_player'].find("a")['href']}),
+                                                   'year': data_dict['year'], 'month': data_dict['month'],
+                                                   'conference': 'AFC', 'unit': 'Defense'})
+            self.player_of_the_months_table.append({'player_id': self.players.players_table.get_primary_key_by_columns_search({'player_url': data_dict['nfc_offensive_player'].find("a")['href']}),
+                                                   'year': data_dict['year'], 'month': data_dict['month'],
+                                                   'conference': 'NFC', 'unit': 'Offense'})
+            self.player_of_the_months_table.append({'player_id': self.players.players_table.get_primary_key_by_columns_search({'player_url': data_dict['nfc_defensive_player'].find("a")['href']}),
+                                                   'year': data_dict['year'], 'month': data_dict['month'],
+                                                   'conference': 'NFC', 'unit': 'Defense'})
+            if data_dict['afc_special_teams_player'].find('a') is not None:
+                self.player_of_the_months_table.append({'player_id': self.players.players_table.get_primary_key_by_columns_search({'player_url': data_dict['afc_special_teams_player'].find("a")['href']}),
+                                                        'year': data_dict['year'], 'month': data_dict['month'],
+                                                        'conference': 'AFC', 'unit': 'Special Teams'})
+            if data_dict['nfc_special_teams_player'].find('a') is not None:
+                self.player_of_the_months_table.append({'player_id': self.players.players_table.get_primary_key_by_columns_search({'player_url': data_dict['nfc_special_teams_player'].find("a")['href']}),
+                                                        'year': data_dict['year'], 'month': data_dict['month'],
+                                                        'conference': 'NFC', 'unit': 'Special Teams'})
+
+
+    def _create_all_rookie_teams(self, links):
+        for link in links:
+            table_parser = TableParser(webscraper.fetch_soup_from_page('https://www.pro-football-reference.com' + link['url']).find(id="all_rookie"), row_has_link,
+                                       DataDictFromObject({'position': get_text_of_element_with_attributes({'data-stat': 'pos'}),
+                                                           'player_url': get_url_of_element_with_attributes({'data-stat': 'player'})},
+                                                          {'year': link['year']}))
+            for data_dict in table_parser.data:
+                data_dict['player_id'] = self.players.players_table.get_primary_key_by_columns_search({'player_url': data_dict['player_url']})
+                self.all_rookie_teams_table.append(data_dict)
+    def _create_all_decade_teams(self, links):
+        for link in links:
+            table_parser = TableParser(webscraper.fetch_soup_from_page('https://www.pro-football-reference.com' + link['url']).find(id="all_decade"), row_has_link,
+                                       DataDictFromObject({'position': get_text_of_element_with_attributes({'data-stat': 'pos'}),
+                                                           'player_url': get_url_of_element_with_attributes({'data-stat': 'player'})}))
+
+            try:
+                all_decade_team_id = self.all_decade_teams_table.get_primary_key_by_columns_search({'all_decade_team_name': link['award']})
+            except NoMatchException:
+                all_decade_team_id = self.all_decade_teams_table.append({'all_decade_team_name': link['award']})
+            for data_dict in table_parser.data:
+                data_dict['player_id'] = self.players.players_table.get_primary_key_by_columns_search({'player_url': data_dict['player_url']})
+                data_dict['all_decade_team_id'] = all_decade_team_id
+                self.all_decade_teams_table.append(data_dict)
 
     def _create_voting_summaries(self, links):
         for link in links:
-            print(link)
+            soup = webscraper.fetch_soup_from_page(f'https://www.pro-football-reference.com{link["url"]}')
+            for table_wrapper in soup.find_all("div", {'class': "table_wrapper"}):
+                award_name = table_wrapper.find("h2").text.replace(' Voting', '')
+                try:
+                    award_id = self.awards_table.get_primary_key_by_columns_search({'award_name': award_name})
+                except NoMatchException:
+                    award_id = self.awards_table.append({'award_name': award_name})
+                table_parser = TableParser(table_wrapper.find("table"), is_header_numeric, DataDictFromObject({'player_element': get_element_with_attributes({'data-stat': 'player'}),
+                                                                                                               'coach_element': get_element_with_attributes({'data-stat': 'coach'}),
+                                                                                            'vote_points': get_text_of_element_with_attributes({'data-stat': 'votes'}),
+                                                                                            'first_place_votes': get_text_of_element_with_attributes({'data-stat': 'votes_first'}),
+                                                                                            'share': get_text_of_element_with_attributes({'data-stat': 'share'})}))
+                for data_dict in table_parser.data:
+                    data_dict['player_id'] = -1
+                    data_dict['coach_id'] = -1
+                    data_dict['award_id'] = award_id
+                    if data_dict['player_element'] is not None:
+                        data_dict['player_id'] = self.players.players_table.get_primary_key_by_columns_search({'player_url': data_dict['player_element'].find('a')['href']})
+                    if data_dict['coach_element'] is not None:
+                        data_dict['coach_id'] = self.coaches.coaches_table.get_primary_key_by_columns_search({'coach_url': data_dict['coach_element'].find('a')['href']})
+                    self.awards_voting_summary_table.append(data_dict)
+
 
     def _create_other_all_pros(self, links):
         for link in links:

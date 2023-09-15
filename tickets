@@ -14,3 +14,4 @@ ticket-013: Create the executives (CHECK)
 ticket-014: Remove the + from the coaches
 ticket-015: From a team, get the roster
 ticket-016: Get the retired number of a franchise
+ticket-017: Create a way to do the object lookup right away in table parser
