@@ -6,7 +6,10 @@ import selenium
 def fetch_soup_from_page(url):
     while True:
         try:
-            driver = webdriver.Chrome()
+            options = webdriver.ChromeOptions()
+            options.add_argument('headless')
+            options.add_argument('window-size=1200x600')
+            driver = webdriver.Chrome(options=options)
             driver.get(url)
             page = driver.page_source
             driver.quit()
