@@ -8,10 +8,11 @@ from games import Games
 from awards import Awards
 from coaches import Coaches
 from executives import Executives
+from rosters import Rosters
 
 if __name__ == '__main__':
     which_dicts = {'franchises': False, 'leagues': False, 'teams': False, 'players': False, 'drafts': False, 'games': False,
-                   'awards': False, 'coaches': False, 'executives': False}
+                   'awards': False, 'coaches': False, 'executives': False, 'rosters': False}
     for argument in sys.argv:
         which_dicts[argument] = True
     if 'all' in sys.argv:
@@ -25,6 +26,7 @@ if __name__ == '__main__':
                }
     objects['teams'] = Teams(which_dicts['teams'], objects['franchises'], objects['leagues'])
     objects['drafts'] = Drafts(which_dicts['drafts'], objects['leagues'], objects['teams'], objects['players'])
+    objects['rosters'] = Rosters(which_dicts['rosters'], objects['players'], objects['teams'])
     #objects['awards'] = Awards(which_dicts['awards'], objects['players'], objects['coaches'], objects['executives'])
     #games = Games(which_dicts['games'], leagues, teams)
     for key in objects.keys():
