@@ -9,7 +9,7 @@ def  get_database_connection():
 class DatabaseConnection:
 
     def __init__(self):
-        self.conn = sqlite3.connect("/Users/administrator/Programs/football_grid_trainer/database.db")
+        self.conn = sqlite3.connect("../databases/football-database.db")
 
     def execute(self, statement):
         self.conn.execute(statement)

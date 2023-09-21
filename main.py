@@ -8,6 +8,10 @@ from games import Games
 
 if __name__ == '__main__':
     which_dicts = {'franchises': False, 'leagues': False, 'teams': False, 'players': False, 'drafts': False, 'games': False}
+    for argument in sys.argv[1:]:
+        if argument not in which_dicts.keys():
+            print(f'Argument {argument} is not a valid object, failing')
+            exit(1)
     for argument in sys.argv:
         which_dicts[argument] = True
     if 'all' in sys.argv:
