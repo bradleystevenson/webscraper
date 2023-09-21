@@ -4,7 +4,7 @@ ticket-003: Create the games in a season (CHECK)
 ticket-004: Create the awards from a season
 ticket-005: Create all the trades for draft picks (CHECK)
 ticket-006: Create all the transactions in a season
-ticket-007: Add checks to make sure that the user only enters valid keyword parameters
+ticket-007: Add checks to make sure that the user only enters valid keyword parameters (CHECK)
 ticket-008: Create preseason games
 ticket-009: Create the players that played for teams
 ticket-010: Create the boxscores of games
