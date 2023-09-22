@@ -23,6 +23,10 @@ def get_text_of_element_with_attributes(attributes):
         return get_element_with_attributes(attributes)(html_object).text
     return return_function
 
+def get_url_of_element_with_attributes(attributes):
+    def return_function(html_object):
+        return get_element_with_attributes(attributes)(html_object).find('a')['href']
+    return return_function
 
 def get_element_with_attributes(attributes):
     def return_function(html_object):

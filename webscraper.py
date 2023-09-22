@@ -16,6 +16,8 @@ def fetch_soup_from_page(url):
             soup = BeautifulSoup(page, 'html.parser')
             return soup
         except selenium.common.exceptions.TimeoutException:
+            print("Failing url: url")
             print("Timed out loading page, trying again")
         except selenium.common.exceptions.WebDriverException:
+            print("failing url: " + url)
             print("Web Driver Error, trying again")
