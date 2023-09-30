@@ -1,6 +1,7 @@
 from bradleystevenson2015_database import database
 import json
-from . import fetch_soup_from_page
+from .common_webscraper_functions import fetch_soup_from_page
+from .parser import CreateFromPageParserFactory, ParserObjectFactory
 
 class WebscraperObjectCollection:
 
@@ -21,9 +22,9 @@ class WebscraperObjectCollection:
     def run(self, arguments):
         for webscraper in self.webscrapers:
             if webscraper.object_name in arguments:
-                webscraper.create_from_web(self.databaseObject)
+                webscraper.create_from_web(self)
             else:
-                webscraper.create_from_database(self.databaseObject)
+                webscraper.create_from_database(self)
         self.databaseObject.insert_into_database()
 
 
@@ -34,24 +35,18 @@ class WebscraperObject:
         self.tables = tables
         self.create_from_page_parser = create_from_page_parser
 
-    def create(self, databaseObject, create_from_web):
-        if create_from_web:
-            self.create_from_web(databaseObject)
-        else:
-            self.create_from_database(databaseObject)
-
-    def create_from_web(self, databaseObject):
+    def create_from_web(self, webscraperObjectCollection):
         pass
 
-    def create_from_database(self, databaseObject):
+    def create_from_database(self, webscraperObjectCollection):
         for table_name in self.tables:
-            databaseObject.tables[table_name].generate_from_database()
+            webscraperObjectCollection.databaseObject.tables[table_name].generate_from_database()
 
-    def create_from_page(self, url, databaseObject):
+    def create_from_page(self, url, webscraperObjectCollection):
         if self.create_from_page_parser is None:
             raise Exception("We have no way to create this object")
         data_dict = self.create_from_page_parser.parse(url)
-        return databaseObject.tables[self.tables[0]].append(data_dict)
+        return webscraperObjectCollection.databaseObject.tables[self.tables[0]].append(data_dict)
     
 
 class WebscraperMultiplePageObject(WebscraperObject):
@@ -63,14 +58,14 @@ class WebscraperMultiplePageObject(WebscraperObject):
         self.iterator_table_name = iterator_table_name
         super().__init__(object_name, [table])
 
-    def create_from_web(self, databaseObject):
-        for data_dict in databaseObject.tables[self.iterator_table_name].data:
+    def create_from_web(self, webscraperObjectCollection):
+        for data_dict in webscraperObjectCollection.databaseObject.tables[self.iterator_table_name].data:
             soup = fetch_soup_from_page(self.base_url + data_dict['url'])
             print(self.base_url + data_dict['url'])
             for parser in self.parsers:
-                data = parser.parse_page(soup, data_dict, databaseObject)
+                data = parser.parse_page(soup, data_dict, webscraperObjectCollection.databaseObject)
                 for data_dict in data:
-                    databaseObject.tables[self.table_name].append(data_dict)
+                    webscraperObjectCollection.databaseObject.tables[self.table_name].append(data_dict)
 
 class WebscraperStaticPageObject(WebscraperObject):
 
@@ -80,13 +75,13 @@ class WebscraperStaticPageObject(WebscraperObject):
         self.table_name = table
         super().__init__(object_name, [table])
 
-    def create_from_web(self, databaseObject):
+    def create_from_web(self, webscraperObjectCollection):
         for url in self.urls:
             soup = fetch_soup_from_page(url)
             for parser in self.parsers:
-                data = parser.parse_page(soup, {}, databaseObject)
+                data = parser.parse_page(soup, {}, webscraperObjectCollection.databaseObject)
                 for data_dict in data:
-                    databaseObject.tables[self.table_name].append(data_dict)
+                    webscraperObjectCollection.databaseObject.tables[self.table_name].append(data_dict)
 
 class WebscraperObjectFactory:
 
