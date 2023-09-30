@@ -26,11 +26,11 @@ class ParserObject:
         self.narrow_down_function = narrow_down_function
         self.data_dict_parser = data_dict_parser
 
-    def parse_page(self, soup, data_dict, databaseObject):
+    def parse_page(self, soup, data_dict, webscraperObjectCollection):
         return_array = []
         for eligible_element in self.all_object_selection_function(soup):
             if self.narrow_down_function(eligible_element):
-                return_array.append(self.data_dict_parser.parse(eligible_element, data_dict, databaseObject))
+                return_array.append(self.data_dict_parser.parse(eligible_element, data_dict, webscraperObjectCollection.databaseObject))
         return return_array
 
 class ParserObjectFactory:
@@ -79,14 +79,19 @@ class DataDictParser:
         self.object_urls = object_urls
         self.object_urls_create_if_not_exist = object_urls_create_if_not_exist
 
-    def parse(self, html_object, data_dict, databaseObject):
+    def parse(self, html_object, data_dict, webscraperObject):
         return_dict = {}
         for key in self.function_dict:
             return_dict[key] = self.function_dict[key](html_object)
         for key in self.dict_values:
             return_dict[key] = data_dict[self.dict_values[key]]
         for object_url in self.object_urls:
-            return_dict[object_url['field_name']] = databaseObject.tables[object_url['object_name']].get_primary_key_by_search_dict({'url': get_url_of_element_with_attributes(object_url['attributes'])(html_object)})
+            return_dict[object_url['field_name']] = webscraperObject.databaseObject.tables[object_url['object_name']].get_primary_key_by_search_dict({'url': get_url_of_element_with_attributes(object_url['attributes'])(html_object)})
+        for object_url in self.object_urls_create_if_not_exist:
+            try:
+                return_dict[object_url['field_name']] = webscraperObject.databaseObject.tables[object_url['object_name']].get_primary_key_by_search_dict({'url': get_url_of_element_with_attributes(object_url['attributes'])(html_object)})
+            except Exception:
+                pass
         return return_dict
 
 

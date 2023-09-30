@@ -63,7 +63,7 @@ class WebscraperMultiplePageObject(WebscraperObject):
             soup = fetch_soup_from_page(self.base_url + data_dict['url'])
             print(self.base_url + data_dict['url'])
             for parser in self.parsers:
-                data = parser.parse_page(soup, data_dict, webscraperObjectCollection.databaseObject)
+                data = parser.parse_page(soup, data_dict, webscraperObjectCollection)
                 for data_dict in data:
                     webscraperObjectCollection.databaseObject.tables[self.table_name].append(data_dict)
 
@@ -79,7 +79,7 @@ class WebscraperStaticPageObject(WebscraperObject):
         for url in self.urls:
             soup = fetch_soup_from_page(url)
             for parser in self.parsers:
-                data = parser.parse_page(soup, {}, webscraperObjectCollection.databaseObject)
+                data = parser.parse_page(soup, {}, webscraperObjectCollection)
                 for data_dict in data:
                     webscraperObjectCollection.databaseObject.tables[self.table_name].append(data_dict)
 
