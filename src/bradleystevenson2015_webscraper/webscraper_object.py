@@ -19,6 +19,11 @@ class WebscraperObjectCollection:
             self.webscrapers.append(WebscraperObjectFactory(webscraper_object, custom_objects).webscraper)
 
 
+    def get_webscraper_object_with_name(self, object_name):
+        for webscraper in self.webscrapers:
+            if webscraper.object_name == object_name:
+                return webscraper
+
     def run(self, arguments):
         for webscraper in self.webscrapers:
             if webscraper.object_name in arguments:
@@ -94,12 +99,12 @@ class WebscraperObjectFactory:
             parsers = []
             for parser_dict in self.webscrapper_object_dict['parsers']:
                 parsers.append(ParserObjectFactory(parser_dict).parser)
-            self.webscraper = WebscraperStaticPageObject(webscraper_object_dict['object_name'], webscraper_object_dict['tables'][0], webscraper_object_dict['urls'], parsers)
+            self.webscraper = WebscraperStaticPageObject(webscraper_object_dict['object_name'], webscraper_object_dict['tables'][0], webscraper_object_dict['urls'], parsers, self.create_from_page_parser)
         elif webscraper_object_dict['object_type'] == 'multiple_page':
             parsers = []
             for parser_dict in self.webscrapper_object_dict['parsers']:
                 parsers.append(ParserObjectFactory(parser_dict).parser)
-            self.webscraper = WebscraperMultiplePageObject(webscraper_object_dict['object_name'], webscraper_object_dict['tables'][0], webscraper_object_dict['base_url'], webscraper_object_dict['iterator_table_name'], parsers)
+            self.webscraper = WebscraperMultiplePageObject(webscraper_object_dict['object_name'], webscraper_object_dict['tables'][0], webscraper_object_dict['base_url'], webscraper_object_dict['iterator_table_name'], parsers, self.create_from_page_parser)
         elif webscraper_object_dict['object_type'] == 'custom_object':
             for custom_object in custom_objects:
                 if custom_object.object_name == webscraper_object_dict['object_name']:

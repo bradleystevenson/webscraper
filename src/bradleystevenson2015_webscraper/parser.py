@@ -30,7 +30,7 @@ class ParserObject:
         return_array = []
         for eligible_element in self.all_object_selection_function(soup):
             if self.narrow_down_function(eligible_element):
-                return_array.append(self.data_dict_parser.parse(eligible_element, data_dict, webscraperObjectCollection.databaseObject))
+                return_array.append(self.data_dict_parser.parse(eligible_element, data_dict, webscraperObjectCollection))
         return return_array
 
 class ParserObjectFactory:
@@ -91,7 +91,7 @@ class DataDictParser:
             try:
                 return_dict[object_url['field_name']] = webscraperObject.databaseObject.tables[object_url['object_name']].get_primary_key_by_search_dict({'url': get_url_of_element_with_attributes(object_url['attributes'])(html_object)})
             except Exception:
-                pass
+                return_dict[object_url['field_name']] = webscraperObject.get_webscraper_object_with_name(object_url['object_name']).create_from_page("https://www.basketbball-reference.com" + get_url_of_element_with_attributes(object_url['attributes'])(html_object))
         return return_dict
 
 
