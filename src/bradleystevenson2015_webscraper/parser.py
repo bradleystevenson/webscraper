@@ -113,7 +113,10 @@ class FunctionParserFactory:
 
     def __init__(self, field_dict):
         if field_dict['parse_type'] == 'dynamic':
-            return get_value_from_element(field_dict)
+            if 'function_name' in field_dict.keys():
+                self.function = self._get_function(field_dict['function_name'], field_dict['attributes'], field_dict)
+            else:
+                self.function = get_value_from_element(field_dict)
         elif field_dict['parse_type'] == 'static':
             self.function = static_value(field_dict['static_value'])
         else:
