@@ -27,6 +27,16 @@ def get_url_of_element_with_attributes(attributes):
         return get_element_with_attributes(attributes)(html_object).find('a')['href']
     return return_function
 
+def get_text_of_element_with_type(type_name):
+    def return_function(html_object):
+        return get_element_with_type(type_name)(html_object).text
+    return return_function
+
+def get_element_with_type(type_name):
+    def return_function(html_object):
+        return html_object.find(type_name)
+    return return_function
+
 def get_element_with_attributes(attributes):
     def return_function(html_object):
         return html_object.find(attrs=attributes)
@@ -61,5 +71,5 @@ def fetch_soup_from_page(url):
             print("Failing url: url")
             print("Timed out loading page, trying again")
         except selenium.common.exceptions.WebDriverException:
-            print("failing url: " + url)
+            print("failing url: " + str(url))
             print("Web Driver Error, trying again")

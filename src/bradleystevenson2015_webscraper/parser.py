@@ -1,4 +1,4 @@
-from .common_webscraper_functions import fetch_soup_from_page, row_has_link, get_tr_of_stats_table, get_tr_of_table_with_id, get_text_of_element_with_attributes, get_url_of_element_with_attributes, does_html_object_exist, static_value
+from .common_webscraper_functions import fetch_soup_from_page, row_has_link, get_tr_of_stats_table, get_tr_of_table_with_id, get_text_of_element_with_attributes, get_url_of_element_with_attributes, does_html_object_exist, static_value, get_text_of_element_with_type
 
 
 class CreateFromPageParserFactory:
@@ -13,13 +13,13 @@ class CreateFromPageParser:
         self.base_url = base_url
         self.data_dict_parser = data_dict_parser
 
-    def parse(self, url):
+    def parse(self, url, webscraperObjectCollection):
         soup = fetch_soup_from_page(self.base_url + url)
-        data_dict = self.data_dict_parser.parse(soup)
+        data_dict = self.data_dict_parser.parse(soup, {}, webscraperObjectCollection)
         data_dict['url'] = url
         return data_dict
 
-class ParserObject:
+class TableParserObject:
 
     def __init__(self, all_object_selection_function, narrow_down_function, data_dict_parser):
         self.all_object_selection_function = all_object_selection_function
@@ -46,9 +46,9 @@ class ParserObjectFactory:
         self.parser_dict = parser_dict
         if parser_dict['parser_type'] == 'table':
             if 'table_id' in parser_dict.keys():
-                self.parser = ParserObject(get_tr_of_table_with_id(parser_dict['table_id']), self._get_narrow_down_function(parser_dict['narrow_down_function']), DataDictParserFactory(parser_dict['data_dict_parser']).data_dict_parser)
+                self.parser = TableParserObject(get_tr_of_table_with_id(parser_dict['table_id']), self._get_narrow_down_function(parser_dict['narrow_down_function']), DataDictParserFactory(parser_dict['data_dict_parser']).data_dict_parser)
             else:
-                self.parser = ParserObject(get_tr_of_stats_table(), self._get_narrow_down_function(parser_dict['narrow_down_function']), DataDictParserFactory(parser_dict['data_dict_parser']).data_dict_parser)
+                self.parser = TableParserObject(get_tr_of_stats_table(), self._get_narrow_down_function(parser_dict['narrow_down_function']), DataDictParserFactory(parser_dict['data_dict_parser']).data_dict_parser)
         else:
             raise Exception("No match for parser type")
 
@@ -91,7 +91,7 @@ class DataDictParser:
             try:
                 return_dict[object_url['field_name']] = webscraperObject.databaseObject.tables[object_url['object_name']].get_primary_key_by_search_dict({'url': get_url_of_element_with_attributes(object_url['attributes'])(html_object)})
             except Exception:
-                return_dict[object_url['field_name']] = webscraperObject.get_webscraper_object_with_name(object_url['object_name']).create_from_page("https://www.basketbball-reference.com" + get_url_of_element_with_attributes(object_url['attributes'])(html_object))
+                return_dict[object_url['field_name']] = webscraperObject.get_webscraper_object_with_name(object_url['object_name']).create_from_page(get_url_of_element_with_attributes(object_url['attributes'])(html_object), webscraperObject)
         return return_dict
 
 
@@ -106,8 +106,10 @@ class FunctionParserFactory:
             return get_url_of_element_with_attributes(attributes)
         elif function_name == 'does_html_object_exist':
             return does_html_object_exist(attributes, field_dict['html_object'])
+        elif function_name == 'get_text_of_element_with_type':
+            return get_text_of_element_with_type(field_dict['element_type'])
         else:
-            raise Exception("No match for function")
+            raise Exception("No match for function " + function_name)
 
     def __init__(self, field_dict):
         if field_dict['parse_type'] == 'dynamic':

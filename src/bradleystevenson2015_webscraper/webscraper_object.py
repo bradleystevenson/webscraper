@@ -50,18 +50,20 @@ class WebscraperObject:
     def create_from_page(self, url, webscraperObjectCollection):
         if self.create_from_page_parser is None:
             raise Exception("We have no way to create this object")
-        data_dict = self.create_from_page_parser.parse(url)
+        data_dict = self.create_from_page_parser.parse(url, webscraperObjectCollection)
+        data_dict['url'] = url
+        print(data_dict)
         return webscraperObjectCollection.databaseObject.tables[self.tables[0]].append(data_dict)
     
 
 class WebscraperMultiplePageObject(WebscraperObject):
 
-    def __init__(self, object_name, table, base_url, iterator_table_name, parsers):
+    def __init__(self, object_name, table, base_url, iterator_table_name, parsers, create_from_page_parser):
         self.base_url = base_url
         self.parsers = parsers
         self.table_name = table
         self.iterator_table_name = iterator_table_name
-        super().__init__(object_name, [table])
+        super().__init__(object_name, [table], create_from_page_parser)
 
     def create_from_web(self, webscraperObjectCollection):
         for data_dict in webscraperObjectCollection.databaseObject.tables[self.iterator_table_name].data:
@@ -74,11 +76,11 @@ class WebscraperMultiplePageObject(WebscraperObject):
 
 class WebscraperStaticPageObject(WebscraperObject):
 
-    def __init__(self, object_name, table, urls, parsers):
+    def __init__(self, object_name, table, urls, parsers, create_from_page_parser):
         self.urls = urls
         self.parsers = parsers
         self.table_name = table
-        super().__init__(object_name, [table])
+        super().__init__(object_name, [table], create_from_page_parser)
 
     def create_from_web(self, webscraperObjectCollection):
         for url in self.urls:
