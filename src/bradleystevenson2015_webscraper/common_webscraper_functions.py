@@ -17,7 +17,7 @@ def get_element(field_dict):
         return html_object.find(element_type, attrs=attributes)
     return return_function
 
-def get_value_from_element(field_dict):
+def get_rough_value_from_element(field_dict):
     if field_dict['html_field_value'] == 'url':
         def return_function(html_object):
             return get_element(field_dict)(html_object).find('a')['href']
@@ -28,6 +28,15 @@ def get_value_from_element(field_dict):
         return return_function
     else:
         raise Exception(f"No match for html field value {field_dict['html_field_value']}")
+
+def get_value_from_element(field_dict):
+    def return_function(html_object):
+        return_value = get_rough_value_from_element(field_dict)(html_object)
+        if 'remove_strings' in field_dict.keys():
+            for remove_string in field_dict['remove_strings']:
+                return_value = return_value.replace(remove_string, '')
+        return return_value
+    return return_function
 
 def static_value(value):
     def return_function(html_object):
