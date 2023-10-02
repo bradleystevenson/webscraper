@@ -25,6 +25,7 @@ def get_value_from_element(field_dict):
     elif field_dict['html_field_value'] == 'text':
         def return_function(html_object):
             return get_element(field_dict)(html_object).text
+        return return_function
     else:
         raise Exception(f"No match for html field value {field_dict['html_field_value']}")
 
