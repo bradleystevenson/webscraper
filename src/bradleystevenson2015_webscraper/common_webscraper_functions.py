@@ -2,6 +2,32 @@ from bs4 import BeautifulSoup
 from selenium import webdriver
 import selenium
 
+def get_element(field_dict):
+    element_type = None
+    attributes = {}
+    if 'element_type' in field_dict.keys():
+        element_type = field_dict['element_type']
+    if 'attributes' in field_dict.keys():
+        attributes = field_dict['attributes']
+    if element_type is None:
+        def return_function(html_object):
+            return html_object.find(attrs=attributes)
+        return return_function
+    def return_function(html_object):
+        return html_object.find(element_type, attrs=attributes)
+    return return_function
+
+def get_value_from_element(field_dict):
+    if field_dict['html_field_value'] == 'url':
+        def return_function(html_object):
+            return get_element(field_dict)(html_object).find('a')['href']
+        return return_function
+    elif field_dict['html_field_value'] == 'text':
+        def return_function(html_object):
+            return get_element(field_dict)(html_object).text
+    else:
+        raise Exception(f"No match for html field value {field_dict['html_field_value']}")
+
 def static_value(value):
     def return_function(html_object):
         return value

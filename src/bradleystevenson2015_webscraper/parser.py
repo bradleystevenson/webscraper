@@ -1,4 +1,4 @@
-from .common_webscraper_functions import fetch_soup_from_page, row_has_link, get_tr_of_stats_table, get_tr_of_table_with_id, get_text_of_element_with_attributes, get_url_of_element_with_attributes, does_html_object_exist, static_value, get_text_of_element_with_type
+from .common_webscraper_functions import fetch_soup_from_page, row_has_link, get_tr_of_stats_table, get_tr_of_table_with_id, get_text_of_element_with_attributes, get_url_of_element_with_attributes, does_html_object_exist, static_value, get_text_of_element_with_type, get_value_from_element
 
 
 class CreateFromPageParserFactory:
@@ -113,7 +113,7 @@ class FunctionParserFactory:
 
     def __init__(self, field_dict):
         if field_dict['parse_type'] == 'dynamic':
-            self.function = self._get_function(field_dict['function_name'], field_dict['attributes'], field_dict)
+            return get_value_from_element(field_dict)
         elif field_dict['parse_type'] == 'static':
             self.function = static_value(field_dict['static_value'])
         else:
