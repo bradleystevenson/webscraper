@@ -1,5 +1,5 @@
 from .common_webscraper_functions import fetch_soup_from_page, row_has_link, get_tr_of_stats_table, get_tr_of_table_with_id, get_text_of_element_with_attributes, get_url_of_element_with_attributes, does_html_object_exist, static_value, get_text_of_element_with_type, get_value_from_element
-
+import logging
 
 class CreateFromPageParserFactory:
 
@@ -56,6 +56,7 @@ class ParserObjectFactory:
 class DataDictParserFactory:
 
     def __init__(self, data_dict_parser_dict):
+        logging.info('[DataDictParserFactory] [Init] ' + str(data_dict_parser_dict))
         return_dict = {}
         dict_values = {}
         object_urls = []
