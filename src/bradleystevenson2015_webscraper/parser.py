@@ -1,4 +1,4 @@
-from .common_webscraper_functions import fetch_soup_from_page, row_has_link, get_tr_of_stats_table, get_tr_of_table_with_id, get_text_of_element_with_attributes, get_url_of_element_with_attributes, does_html_object_exist, static_value, get_text_of_element_with_type, get_value_from_element
+from .common_webscraper_functions import fetch_soup_from_page, row_has_link, get_tr_of_stats_table, get_tr_of_table_with_id, get_url_of_element_with_attributes, does_html_object_exist
 from .field_parser import FieldParserFactory
 import logging
 

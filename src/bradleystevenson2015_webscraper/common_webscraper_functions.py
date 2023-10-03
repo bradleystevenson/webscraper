@@ -38,24 +38,12 @@ def get_value_from_element(field_dict):
         return return_value
     return return_function
 
-def static_value(value):
-    def return_function(html_object):
-        return value
-    return return_function
 
 def does_html_object_exist(attributes, object_type):
     def return_function(html_object):
         if get_element_with_attributes(attributes)(html_object).find(object_type) is not None:
             return 1
         return 0
-    return return_function
-
-def get_text_of_element_with_attributes(attributes, remove_strings=[]):
-    def return_function(html_object):
-        return_string = get_element_with_attributes(attributes)(html_object).text
-        for remove_string in remove_strings:
-            return_string = return_string.replace(remove_string, '')
-        return return_string
     return return_function
 
 def get_url_of_element_with_attributes(attributes):
