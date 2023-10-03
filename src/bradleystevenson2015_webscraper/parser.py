@@ -1,4 +1,5 @@
 from .common_webscraper_functions import fetch_soup_from_page, row_has_link, get_tr_of_stats_table, get_tr_of_table_with_id, get_text_of_element_with_attributes, get_url_of_element_with_attributes, does_html_object_exist, static_value, get_text_of_element_with_type, get_value_from_element
+from .field_parser import FieldParserFactory
 import logging
 
 class CreateFromPageParserFactory:
@@ -57,35 +58,20 @@ class DataDictParserFactory:
 
     def __init__(self, data_dict_parser_dict):
         logging.info('[DataDictParserFactory] [Init] ' + str(data_dict_parser_dict))
-        return_dict = {}
-        dict_values = {}
-        object_urls = []
-        object_urls_create_if_not_exist = []
+        field_parsers = []
         for field_dict in data_dict_parser_dict:
-            if field_dict['parse_type'] == 'input_dict':
-                dict_values[field_dict['field_name']] = field_dict['dict_key']
-            elif field_dict['parse_type'] == 'url_of_object':
-                object_urls.append(field_dict)
-            elif field_dict['parse_type'] == 'url_of_object_create_if_not_exist':
-                object_urls_create_if_not_exist.append(field_dict)
-            else:
-                return_dict[field_dict['field_name']] = FunctionParserFactory(field_dict).function
-        self.data_dict_parser = DataDictParser(return_dict, dict_values, object_urls, object_urls_create_if_not_exist)
+            field_parsers.append(FieldParserFactory(field_dict).get_field_parser())
+        self.data_dict_parser = DataDictParser(field_parsers)
 
 class DataDictParser:
 
-    def __init__(self, function_dict, dict_values, object_urls, object_urls_create_if_not_exist):
-        self.function_dict = function_dict
-        self.dict_values = dict_values
-        self.object_urls = object_urls
-        self.object_urls_create_if_not_exist = object_urls_create_if_not_exist
+    def __init__(self, field_parsers):
+        self.field_parsers = field_parsers
 
     def parse(self, html_object, data_dict, webscraperObject):
         return_dict = {}
-        for key in self.function_dict:
-            return_dict[key] = self.function_dict[key](html_object)
-        for key in self.dict_values:
-            return_dict[key] = data_dict[self.dict_values[key]]
+        for field_parser in self.field_parsers:
+            return_dict[field_parser.field_name] = field_parser.parse(html_object, data_dict, webscraperObject)
         for object_url in self.object_urls:
             return_dict[object_url['field_name']] = webscraperObject.databaseObject.tables[object_url['object_name']].get_primary_key_by_search_dict({'url': get_url_of_element_with_attributes(object_url['attributes'])(html_object)})
         for object_url in self.object_urls_create_if_not_exist:
@@ -94,31 +80,3 @@ class DataDictParser:
             except Exception:
                 return_dict[object_url['field_name']] = webscraperObject.get_webscraper_object_with_name(object_url['object_name']).create_from_page(get_url_of_element_with_attributes(object_url['attributes'])(html_object), webscraperObject)
         return return_dict
-
-
-class FunctionParserFactory:
-
-    def _get_function(self, function_name, attributes, field_dict):
-        if function_name == 'get_text_of_element_with_attributes':
-            if 'remove_strings' in field_dict.keys():
-                return get_text_of_element_with_attributes(attributes, field_dict['remove_strings'])
-            return get_text_of_element_with_attributes(attributes)
-        elif function_name == 'get_url_of_element_with_attributes':
-            return get_url_of_element_with_attributes(attributes)
-        elif function_name == 'does_html_object_exist':
-            return does_html_object_exist(attributes, field_dict['html_object'])
-        elif function_name == 'get_text_of_element_with_type':
-            return get_text_of_element_with_type(field_dict['element_type'])
-        else:
-            raise Exception("No match for function " + function_name)
-
-    def __init__(self, field_dict):
-        if field_dict['parse_type'] == 'dynamic':
-            if 'function_name' in field_dict.keys():
-                self.function = self._get_function(field_dict['function_name'], field_dict['attributes'], field_dict)
-            else:
-                self.function = get_value_from_element(field_dict)
-        elif field_dict['parse_type'] == 'static':
-            self.function = static_value(field_dict['static_value'])
-        else:
-            raise Exception("No match for function parse_type")
