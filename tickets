@@ -4,3 +4,4 @@ ticket-003: Create a way for removing strings from the return values (CHECK)
 ticket-004: Fix the None return value from methods (CHECK)
 ticket-005: Remove the unneeded method calls (CHECK)
 ticket-006: Have the ability to alter url before finding the object id (CHECK)
+ticket-007: Create a way to cache pages
