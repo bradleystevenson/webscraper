@@ -1,6 +1,7 @@
 from bs4 import BeautifulSoup
 from selenium import webdriver
 import selenium
+import logging
 
 def get_element(field_dict):
     element_type = None
@@ -18,6 +19,7 @@ def get_element(field_dict):
     return return_function
 
 def get_rough_value_from_element(field_dict):
+    logging.info("[GET_ROUGH_VALUE_FROM_ELEMENT] " + str(field_dict))
     if field_dict['html_field_value'] == 'url':
         def return_function(html_object):
             return get_element(field_dict)(html_object).find('a')['href']
@@ -38,27 +40,11 @@ def get_value_from_element(field_dict):
         return return_value
     return return_function
 
-
-def does_html_object_exist(attributes, object_type):
+def does_html_object_exist(field_dict):
     def return_function(html_object):
-        if get_element_with_attributes(attributes)(html_object).find(object_type) is not None:
+        if get_element(field_dict)(html_object).find(field_dict['html_object']) is not None:
             return 1
         return 0
-    return return_function
-
-def get_url_of_element_with_attributes(attributes):
-    def return_function(html_object):
-        return get_element_with_attributes(attributes)(html_object).find('a')['href']
-    return return_function
-
-def get_text_of_element_with_type(type_name):
-    def return_function(html_object):
-        return get_element_with_type(type_name)(html_object).text
-    return return_function
-
-def get_element_with_type(type_name):
-    def return_function(html_object):
-        return html_object.find(type_name)
     return return_function
 
 def get_element_with_attributes(attributes):
@@ -78,6 +64,9 @@ def get_tr_of_stats_table():
 
 def row_has_link(html_object):
     return html_object.find("a") is not None
+
+def true(html_object):
+    return True
 
 def fetch_soup_from_page(url):
     while True:

@@ -1,4 +1,4 @@
-from .common_webscraper_functions import fetch_soup_from_page, row_has_link, get_tr_of_stats_table, get_tr_of_table_with_id, get_url_of_element_with_attributes, does_html_object_exist
+from .common_webscraper_functions import fetch_soup_from_page, row_has_link, get_tr_of_stats_table, get_tr_of_table_with_id, true
 from .field_parser import FieldParserFactory
 import logging
 
@@ -39,6 +39,8 @@ class ParserObjectFactory:
     def _get_narrow_down_function(self, function_name):
         if function_name == 'row_has_link':
             return row_has_link
+        elif function_name == 'true':
+            return true
         else:
             raise Exception("No match for narrow down function")
 
@@ -72,11 +74,4 @@ class DataDictParser:
         return_dict = {}
         for field_parser in self.field_parsers:
             return_dict[field_parser.field_name] = field_parser.parse(html_object, data_dict, webscraperObject)
-        for object_url in self.object_urls:
-            return_dict[object_url['field_name']] = webscraperObject.databaseObject.tables[object_url['object_name']].get_primary_key_by_search_dict({'url': get_url_of_element_with_attributes(object_url['attributes'])(html_object)})
-        for object_url in self.object_urls_create_if_not_exist:
-            try:
-                return_dict[object_url['field_name']] = webscraperObject.databaseObject.tables[object_url['object_name']].get_primary_key_by_search_dict({'url': get_url_of_element_with_attributes(object_url['attributes'])(html_object)})
-            except Exception:
-                return_dict[object_url['field_name']] = webscraperObject.get_webscraper_object_with_name(object_url['object_name']).create_from_page(get_url_of_element_with_attributes(object_url['attributes'])(html_object), webscraperObject)
         return return_dict

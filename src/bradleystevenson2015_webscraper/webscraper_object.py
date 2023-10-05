@@ -52,7 +52,6 @@ class WebscraperObject:
             raise Exception("We have no way to create this object")
         data_dict = self.create_from_page_parser.parse(url, webscraperObjectCollection)
         data_dict['url'] = url
-        print(data_dict)
         return webscraperObjectCollection.databaseObject.tables[self.tables[0]].append(data_dict)
     
 
