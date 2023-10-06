@@ -3,6 +3,8 @@ from selenium import webdriver
 import selenium
 import logging
 
+webpage_cache = {}
+
 def get_element(field_dict):
     element_type = None
     attributes = {}
@@ -68,7 +70,10 @@ def row_has_link(html_object):
 def true(html_object):
     return True
 
-def fetch_soup_from_page(url):
+def fetch_soup_from_page(url, cache=False, cache_tag=None):
+    if cache:
+        if cache_tag in webpage_cache.keys() and url in webpage_cache[cache_tag].keys():
+            return webpage_cache[cache_tag][url]
     while True:
         try:
             options = webdriver.ChromeOptions()
@@ -79,6 +84,10 @@ def fetch_soup_from_page(url):
             page = driver.page_source
             driver.quit()
             soup = BeautifulSoup(page, 'html.parser')
+            if cache:
+                if cache_tag not in webpage_cache.keys():
+                    webpage_cache[cache_tag] = {}
+                webpage_cache[cache_tag][url] = soup
             return soup
         except selenium.common.exceptions.TimeoutException:
             print("Failing url: url")
