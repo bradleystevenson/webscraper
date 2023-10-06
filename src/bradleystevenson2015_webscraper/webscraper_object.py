@@ -25,12 +25,26 @@ class WebscraperObjectCollection:
                 return webscraper
 
     def run(self, arguments):
+        self._parse_arguments(arguments)
         for webscraper in self.webscrapers:
             if webscraper.object_name in arguments:
                 webscraper.create_from_web(self)
             else:
                 webscraper.create_from_database(self)
         self.databaseObject.insert_into_database()
+
+    def _parse_arguments(self, arguments):
+        return_dict = {}
+        for webscraper in self.webscrapers:
+            return_dict[webscraper.object_name] = False
+        for argument in arguments:
+            if argument not in return_dict.keys() and argument != 'all':
+                raise Exception("No match for object name")
+            return_dict[argument] = True
+        if 'all' in arguments:
+            for key in return_dict.keys():
+                return_dict[key] = True
+        return return_dict
 
 
 class WebscraperObject:
