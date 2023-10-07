@@ -2,6 +2,8 @@ from bradleystevenson2015_database import database
 import json
 from .common_webscraper_functions import fetch_soup_from_page
 from .parser import CreateFromPageParserFactory, ParserObjectFactory
+import logging
+
 
 class WebscraperObjectCollection:
 
@@ -25,23 +27,21 @@ class WebscraperObjectCollection:
                 return webscraper
 
     def run(self, arguments):
-        self._parse_arguments(arguments)
+        create_from_web_dict = self._parse_arguments(arguments)
         for webscraper in self.webscrapers:
-            if webscraper.object_name in arguments:
-                webscraper.create_from_web(self)
-            else:
-                webscraper.create_from_database(self)
+            webscraper.create(create_from_web_dict[webscraper.object_name], self)
         self.databaseObject.insert_into_database()
 
     def _parse_arguments(self, arguments):
+        logging.info("[WEBSCRAPER] [_PARSE_ARGUMENTS] " + str(arguments))
         return_dict = {}
         for webscraper in self.webscrapers:
             return_dict[webscraper.object_name] = False
-        for argument in arguments:
+        for argument in arguments[1:]:
             if argument not in return_dict.keys() and argument != 'all':
                 raise Exception("No match for object name")
             return_dict[argument] = True
-        if 'all' in arguments:
+        if 'all' in arguments[1:]:
             for key in return_dict.keys():
                 return_dict[key] = True
         return return_dict
@@ -53,6 +53,13 @@ class WebscraperObject:
         self.object_name = object_name
         self.tables = tables
         self.create_from_page_parser = create_from_page_parser
+
+    def create(self, create_from_web, webscraperObjectCollection):
+        logging.info("[WebscraperObject] [create] " + self.object_name + " " + str(create_from_web))
+        if create_from_web:
+            self.create_from_web(webscraperObjectCollection)
+        else:
+            self.create_from_database(webscraperObjectCollection)
 
     def create_from_web(self, webscraperObjectCollection):
         pass
