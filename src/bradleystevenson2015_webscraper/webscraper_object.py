@@ -27,6 +27,9 @@ class WebscraperObjectCollection:
                 return webscraper
 
     def run(self, arguments):
+        if '--create-tables' in arguments:
+            self.databaseObject.create_tables()
+            exit(0)
         create_from_web_dict = self._parse_arguments(arguments)
         for webscraper in self.webscrapers:
             webscraper.create(create_from_web_dict[webscraper.object_name], self)
