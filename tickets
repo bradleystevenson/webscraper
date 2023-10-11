@@ -5,6 +5,6 @@ ticket-004: Fix the None return value from methods (CHECK)
 ticket-005: Remove the unneeded method calls (CHECK)
 ticket-006: Have the ability to alter url before finding the object id (CHECK)
 ticket-007: Create a way to cache pages
-ticket-008: Create a way for the all command to reference all the different object variables
-ticket-009: Create a way for there to be an error if there is a parameter that isnt all/object name passed in
-ticket-010: Create a way to just create the database, so nothing other than required gets run
+ticket-008: Create a way for the all command to reference all the different object variables (CHECK)
+ticket-009: Create a way for there to be an error if there is a parameter that isnt all/object name passed in (CHECK)
+ticket-010: Create a way to just create the database, so nothing other than required gets run (CHECK)
