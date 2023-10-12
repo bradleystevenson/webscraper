@@ -15,7 +15,7 @@ class URLGeneratorFactory:
         self.url_dict = url_dict
 
     def get_url_generator(self):
-         if 'iterator' in url_dict.keys():
+        if 'iterator' in url_dict.keys():
             pass
         else:
             return URLGenerator(self.url_dict['base_url'])
