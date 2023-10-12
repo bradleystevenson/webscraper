@@ -2,6 +2,7 @@ from bradleystevenson2015_database import database
 import json
 from .common_webscraper_functions import fetch_soup_from_page
 from .parser import CreateFromPageParserFactory, ParserObjectFactory
+from .url_generator import URLGeneratorFactory
 import logging
 
 
@@ -113,6 +114,25 @@ class WebscraperStaticPageObject(WebscraperObject):
                 for data_dict in data:
                     webscraperObjectCollection.databaseObject.tables[self.table_name].append(data_dict)
 
+class NewWebscraperObject:
+
+    def __init__(self, object_name, table, parsers, url_generator, create_from_page_parser):
+        self.object_name = object_name
+        self.table = table
+        self.parsers = parsers
+        self.create_from_page_parser = create_from_page_parser
+        self.url_generator = url_generator
+        super().__init__(object_name, [table], create_from_page_parser)
+
+    def create_from_web(self, webscraperObjectCollection):
+        for url in self.url_generator.generate_urls:
+            soup = fetch_soup_from_page(url)
+            for parser in self.parsers:
+                data = parser.parse_page(soup, {}, webscraperObjectCollection)
+                for data_dict in data:
+                    webscraperObjectCollection.databaseObject.tables[self.table_name].append(data_dict)
+
+
 class WebscraperObjectFactory:
 
     def __init__(self, webscraper_object_dict, custom_objects):
@@ -120,7 +140,13 @@ class WebscraperObjectFactory:
         self.create_from_page_parser = None
         if 'create_from_page_parser' in webscraper_object_dict.keys():
             self.create_from_page_parser =  CreateFromPageParserFactory(webscraper_object_dict['create_from_page_parser']).create_from_page_parser
-        if webscraper_object_dict['object_type'] == 'single_page':
+        if 'object_type' not in webscraper_object_dict.keys():
+            parsers = []
+            for parser_dict in self.webscrapper_object_dict['parsers']:
+                parsers.append(ParserObjectFactory(parser_dict).parser)
+            url_generator = URLGeneratorFactory(self.webscraper_object_dict['urls'])
+            self.webscraper = NewWebscraperObject(webscraper_object_dict['object_name'], webscraper_object_dict['tables'][0], parsers, url_generator, self.create_from_page_parser)
+        elif webscraper_object_dict['object_type'] == 'single_page':
             parsers = []
             for parser_dict in self.webscrapper_object_dict['parsers']:
                 parsers.append(ParserObjectFactory(parser_dict).parser)
