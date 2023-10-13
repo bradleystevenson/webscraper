@@ -1,8 +1,8 @@
 from bradleystevenson2015_database import database
 import json
-from .common_webscraper_functions import fetch_soup_from_page
-from .parser import CreateFromPageParserFactory, ParserObjectFactory
-from .url_generator import URLGeneratorFactory
+from bradleystevenson2015_webscraper.common_webscraper_functions import fetch_soup_from_page
+from bradleystevenson2015_webscraper.parser import CreateFromPageParserFactory, ParserObjectFactory
+from bradleystevenson2015_webscraper.url_generator import URLGeneratorFactory
 import logging
 
 

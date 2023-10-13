@@ -1,0 +1,3 @@
+{"tables": [
+    {"table_name": "franchises", "columns": ["franchise_name", "active", "url"], "table_type": "object_table"}
+]}

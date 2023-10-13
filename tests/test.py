@@ -1,13 +1,14 @@
 import unittest
 import sys
-sys.path.insert(0, '/Users/bradleystevenson/Programs/python-database-wrapper/src/bradleystevenson2015_database')
+sys.path.insert(0, '/Users/bradleystevenson/Programs/webscraper/src/bradleystevenson2015_webscraper')
 
-from database import Database
+from webscraper_object import WebscraperObjectCollection
 
 class TestDatabase(unittest.TestCase):
 
     def test_initialization(self):
-        assertEqual(1, 1)
+        webscraperObjects = WebscraperObjectCollection("webscraper_schema.json", "../../databases/webscraper-database.db", "database_schema.json", [])
+        webscraperObjects.run(['main.py'])
 
 if __name__ == '__main__':
     unittest.main()

@@ -1,0 +1,71 @@
+{
+    "objects": [
+        {
+            "object_name": "franchises",
+            "tables": [
+              "franchises"
+            ],
+            "urls": {
+              "base_url": "file://franchises.html"
+            },
+            "parsers": [
+              {
+                "parser_type": "table",
+                "table_id": "teams_active",
+                "narrow_down_function": "row_has_link",
+                "data_dict_parser": [
+                  {
+                    "field_name": "franchise_name",
+                    "parse_type": "dynamic",
+                    "html_field_value": "text",
+                    "attributes": {
+                      "data-stat": "franch_name"
+                    }
+                  },
+                  {
+                    "field_name": "active",
+                    "parse_type": "static",
+                    "static_value": 1
+                  },
+                  {
+                    "field_name": "url",
+                    "parse_type": "dynamic",
+                    "html_field_value": "url",
+                    "attributes": {
+                        "data-stat": "franch_name"
+                    }
+                  }
+                ]
+              },
+              {
+                "parser_type": "table",
+                "table_id": "teams_defunct",
+                "narrow_down_function": "row_has_link",
+                "data_dict_parser": [
+                  {
+                    "field_name": "franchise_name",
+                    "parse_type": "dynamic",
+                    "html_field_value": "text",
+                    "attributes": {
+                      "data-stat": "franch_name"
+                    }
+                  },
+                  {
+                    "field_name": "active",
+                    "parse_type": "static",
+                    "static_value": 0
+                  },
+                  {
+                    "field_name": "url",
+                    "parse_type": "dynamic",
+                    "html_field_value": "url",
+                    "attributes": {
+                        "data-stat": "franch_name"
+                    }
+                  }
+                ]
+              }
+            ]
+          }    
+    ]
+}
