@@ -116,16 +116,16 @@ class WebscraperStaticPageObject(WebscraperObject):
 
 class NewWebscraperObject(WebscraperObject):
 
-    def __init__(self, object_name, table, parsers, url_generator, create_from_page_parser):
+    def __init__(self, object_name, table_name, parsers, url_generator, create_from_page_parser):
         self.object_name = object_name
-        self.table = table
+        self.table_name = table_name
         self.parsers = parsers
         self.create_from_page_parser = create_from_page_parser
         self.url_generator = url_generator
-        super().__init__(object_name, [table], create_from_page_parser)
+        super().__init__(object_name, [table_name], create_from_page_parser)
 
     def create_from_web(self, webscraperObjectCollection):
-        for url in self.url_generator.generate_urls:
+        for url in self.url_generator.generate_urls(webscraperObjectCollection):
             soup = fetch_soup_from_page(url)
             for parser in self.parsers:
                 data = parser.parse_page(soup, {}, webscraperObjectCollection)
@@ -144,7 +144,7 @@ class WebscraperObjectFactory:
             for parser_dict in webscraper_object_dict['parsers']:
                 parsers.append(ParserObjectFactory(parser_dict).parser)
             url_generator = URLGeneratorFactory(webscraper_object_dict['urls'])
-            self.webscraper = NewWebscraperObject(webscraper_object_dict['object_name'], webscraper_object_dict['tables'][0], parsers, url_generator, self.create_from_page_parser)
+            self.webscraper = NewWebscraperObject(webscraper_object_dict['object_name'], webscraper_object_dict['tables'][0], parsers, url_generator.get_url_generator(), self.create_from_page_parser)
         elif webscraper_object_dict['object_type'] == 'single_page':
             parsers = []
             for parser_dict in webscraper_object_dict['parsers']:

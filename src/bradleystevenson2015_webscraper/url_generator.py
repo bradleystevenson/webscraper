@@ -8,6 +8,7 @@ class URLGenerator:
         return_strings = []
         if self.iterator is None:
             return_strings.append(self.base_url)
+            return return_strings
 
 class URLGeneratorFactory:
 
@@ -15,7 +16,7 @@ class URLGeneratorFactory:
         self.url_dict = url_dict
 
     def get_url_generator(self):
-        if 'iterator' in url_dict.keys():
+        if 'iterator' in self.url_dict.keys():
             pass
         else:
             return URLGenerator(self.url_dict['base_url'])
