@@ -83,7 +83,6 @@ class NewWebscraperObject(WebscraperObject):
 
     def __init__(self, object_name, parsers, url_generator, create_from_page_parser):
         self.object_name = object_name
-        self.table_name = table_name
         self.parsers = parsers
         self.create_from_page_parser = create_from_page_parser
         self.url_generator = url_generator
