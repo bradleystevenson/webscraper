@@ -145,16 +145,6 @@ class WebscraperObjectFactory:
                 parsers.append(ParserObjectFactory(parser_dict).parser)
             url_generator = URLGeneratorFactory(webscraper_object_dict['urls'])
             self.webscraper = NewWebscraperObject(webscraper_object_dict['object_name'], webscraper_object_dict['tables'][0], parsers, url_generator.get_url_generator(), self.create_from_page_parser)
-        elif webscraper_object_dict['object_type'] == 'single_page':
-            parsers = []
-            for parser_dict in webscraper_object_dict['parsers']:
-                parsers.append(ParserObjectFactory(parser_dict).parser)
-            self.webscraper = WebscraperStaticPageObject(webscraper_object_dict['object_name'], webscraper_object_dict['tables'][0], webscraper_object_dict['urls'], parsers, self.create_from_page_parser)
-        elif webscraper_object_dict['object_type'] == 'multiple_page':
-            parsers = []
-            for parser_dict in webscraper_object_dict['parsers']:
-                parsers.append(ParserObjectFactory(parser_dict).parser)
-            self.webscraper = WebscraperMultiplePageObject(webscraper_object_dict['object_name'], webscraper_object_dict['tables'][0], webscraper_object_dict['base_url'], webscraper_object_dict['iterator_table_name'], parsers, self.create_from_page_parser)
         elif webscraper_object_dict['object_type'] == 'custom_object':
             for custom_object in custom_objects:
                 if custom_object.object_name == webscraper_object_dict['object_name']:
