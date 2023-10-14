@@ -5,7 +5,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "bradleystevenson2015_webscraper"
-version = "0.0.56"
+version = "0.0.57"
 authors = [
   { name="Bradley Stevenson", email="bradleystevenson2015@gmail.com" },
 ]
@@ -21,4 +21,5 @@ classifiers = [
 [project.urls]
 "Homepage" = "https://github.com/pypa/sampleproject"
 "Bug Tracker" = "https://github.com/pypa/sampleproject/issues"
+
 
