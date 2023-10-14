@@ -69,6 +69,7 @@ def true(html_object):
     return True
 
 def fetch_soup_from_page(url):
+    print(url)
     while True:
         try:
             options = webdriver.ChromeOptions()
