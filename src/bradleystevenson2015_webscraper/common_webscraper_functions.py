@@ -10,12 +10,35 @@ def get_element(field_dict):
         element_type = field_dict['element_type']
     if 'attributes' in field_dict.keys():
         attributes = field_dict['attributes']
+    if 'id' in field_dict.keys():
+        def return_function(html_object):
+            return html_object.find(id=field_dict['id'])
+        return return_function
     if element_type is None:
         def return_function(html_object):
             return html_object.find(attrs=attributes)
         return return_function
     def return_function(html_object):
         return html_object.find(element_type, attrs=attributes)
+    return return_function
+
+def get_children_element(field_dict):
+    element_type = None
+    attributes = {}
+    if 'element_type' in field_dict.keys():
+        element_type = field_dict['element_type']
+    if 'attributes' in field_dict.keys():
+        attributes = field_dict['attributes']
+    if 'id' in field_dict.keys():
+        def return_function(html_object):
+            return html_object.find_all(id=field_dict['id'])
+        return return_function
+    if element_type is None:
+        def return_function(html_object):
+            return html_object.find_all(attrs=attributes)
+        return return_function
+    def return_function(html_object):
+        return html_object.find_all(element_type, attrs=attributes)
     return return_function
 
 def get_rough_value_from_element(field_dict):
@@ -47,11 +70,6 @@ def does_html_object_exist(field_dict):
         return 0
     return return_function
 
-def get_element_with_attributes(attributes):
-    def return_function(html_object):
-        return html_object.find(attrs=attributes)
-    return return_function
-
 def get_tr_of_table_with_id(table_id):
     def return_function(soup):
         return soup.find(id=table_id).find("tbody").find_all("tr")
@@ -80,8 +98,6 @@ def fetch_soup_from_page(url):
             page = driver.page_source
             driver.quit()
             soup = BeautifulSoup(page, 'html.parser')
-            logging.info('[FETCH_SOUP-FROM_Page]')
-            logging.info(soup)
             return soup
         except selenium.common.exceptions.TimeoutException:
             logging.warn("Timeout")

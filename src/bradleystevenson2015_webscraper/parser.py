@@ -34,6 +34,18 @@ class TableParserObject:
                 return_array.append(self.data_dict_parser.parse(eligible_element, data_dict, webscraperObjectCollection))
         return return_array
 
+class ParserObject:
+
+    def __init__(self, base_object_function, children_element_function):
+        self.base_object_function = base_object_function
+        self.children_element_function = children_element_function
+
+    def parse_page(self, soup, data_dict, webscraperObjectCollection):
+        return_array = []
+        for eligible_element in self.children_element_function(self.base_object_function(soup)):
+            return_array.append(self.data_dict_parser.parse(eligible_element, data_dict, webscraperObjectCollection))
+        return return_array
+
 class ParserObjectFactory:
 
     def _get_narrow_down_function(self, function_name):
@@ -52,6 +64,8 @@ class ParserObjectFactory:
                 self.parser = TableParserObject(get_tr_of_table_with_id(parser_dict['table_id']), self._get_narrow_down_function(parser_dict['narrow_down_function']), DataDictParserFactory(parser_dict['data_dict_parser']).data_dict_parser)
             else:
                 self.parser = TableParserObject(get_tr_of_stats_table(), self._get_narrow_down_function(parser_dict['narrow_down_function']), DataDictParserFactory(parser_dict['data_dict_parser']).data_dict_parser)
+        elif parser_dict['parser_type'] == 'generic':
+            self.parser = ParserObject(get_element(parser_dict['base_object']), get_children_element(parser_dict['base_element']))
         else:
             raise Exception("No match for parser type")
 
