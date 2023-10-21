@@ -1,4 +1,5 @@
 from .common_webscraper_functions import get_element
+from .parser import DataDictParser
 
 
 class HTMLObjectIteratorFactory:

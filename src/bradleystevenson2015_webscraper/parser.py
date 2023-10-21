@@ -37,7 +37,7 @@ class TableParserObject:
 
 class GenericParserObject:
 
-    def __init__(self, html_object_iterator: HTMLObjectIterator, data_dict_parser: DataDictParser):
+    def __init__(self, html_object_iterator: HTMLObjectIterator, data_dict_parser):
         self.html_object_iterator = html_object_iterator
         self.data_dict_parser = data_dict_parser
 
