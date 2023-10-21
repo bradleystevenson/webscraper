@@ -65,7 +65,7 @@ class ObjectFetcher:
 
 class ChildrenObjectFetcher:
 
-    def __init___(self, definition_dict):
+    def __init__(self, definition_dict):
         self.children_element_function = get_children_element(definition_dict)
 
     def fetch_children(self, soup):
