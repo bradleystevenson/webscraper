@@ -1,6 +1,6 @@
 from .common_webscraper_functions import fetch_soup_from_page, row_has_link, get_tr_of_stats_table, get_tr_of_table_with_id, true
 from .field_parser import FieldParserFactory
-from .object_fetcher import ObjectFetcherFactory, HTMLObjectIterator
+from .object_fetcher import ObjectFetcherFactory, HTMLObjectIterator, HTMLObjectIteratorFactory
 import logging
 
 class CreateFromPageParserFactory:
