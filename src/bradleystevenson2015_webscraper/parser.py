@@ -73,7 +73,7 @@ class ParserObjectFactory:
     def __init__(self, parser_dict):
         self.parser_dict = parser_dict
         if 'html_object_iterator' in parser_dict.keys():
-            html_object_iterator = HTMLObjectIteratorFactory(parser_dict['html_object_iterator'])
+            html_object_iterator = HTMLObjectIteratorFactory(parser_dict['html_object_iterator']).create()
             data_dict_parser = DataDictParserFactory(parser_dict['data_dict_parser']).data_dict_parser
             self.parser = GenericParserObject(html_object_iterator, data_dict_parser)
         elif parser_dict['parser_type'] == 'table':
