@@ -1,4 +1,4 @@
-from .common_webscraper_functions import get_element
+from .common_webscraper_functions import get_element, get_children_element
 
 class HTMLObjectIteratorFactory:
 
