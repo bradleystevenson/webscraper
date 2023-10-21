@@ -1,0 +1,55 @@
+{  
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "description": "This defines the webscraper tickets as we use them",
+    "type": "object",
+    "properties": {
+        "objects": {
+            "description": "This is the base array of all the different objects in the table",
+            "type": "array",
+            "properties": {
+                "object_name": {
+                    "type": "string",
+                    "description": "name of the object"
+                },
+                "urls": {
+                    "type": "object",
+                    "description": "Creates the list of urls to parse for this object",
+                    "properties": {
+                        "base_url": {
+                            "type": "string",
+                            "description": "Base url to modify and iterate over"
+                        },
+                        "iterator": {
+                            "type": "object",
+                            "description": "how we calculate which URLs to use",
+                            "properties": {
+                                "hardcoded": {
+                                    "type": "array",
+                                    "description": "Array of hardcoded strings to try and replace in the base url"
+                                },
+                                "object": {
+                                    "type": "string",
+                                    "description": "object to get the urls of to iterate over for the url replacement"
+                                }
+                            }
+                        }
+                    }
+                },
+                "parsers": {
+                    "type": "array",
+                    "description": "Determines how we parse the information from the page",
+                    "properties": {
+                        "parser_type": {
+                            "type": "string",
+                            "description": "Tells us what kind of parser to use"
+                        },
+                        "table_id": {
+                            "type": "string",
+                            "description": "id of the table to get"
+                        }
+                    }
+                }
+            }
+        }
+    }   
+}

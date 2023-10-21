@@ -1,5 +1,6 @@
 from .common_webscraper_functions import fetch_soup_from_page, row_has_link, get_tr_of_stats_table, get_tr_of_table_with_id, true
 from .field_parser import FieldParserFactory
+from .obejct_fetcher import ObjectFetcherFactory
 import logging
 
 class CreateFromPageParserFactory:
@@ -34,6 +35,18 @@ class TableParserObject:
                 return_array.append(self.data_dict_parser.parse(eligible_element, data_dict, webscraperObjectCollection))
         return return_array
 
+class GenericParserObject:
+
+    def __init__(self, html_object_iterator: HTMLObjectIterator, data_dict_parser: DataDictParser):
+        self.html_object_iterator = html_object_iterator
+        self.data_dict_parser = data_dict_parser
+
+    def parse_page(self, soup, data_dict, webscraper_object_collection):
+        return_array = []
+        for eligible_element in self.html_object_iterator.get_valid_elements(soup):
+            return_array.append(self.data_dict_parser.parse(eligible_element, data_dict, webscraper_object_collection))
+        return return_array 
+
 class ParserObject:
 
     def __init__(self, base_object_function, children_element_function):
@@ -59,7 +72,11 @@ class ParserObjectFactory:
 
     def __init__(self, parser_dict):
         self.parser_dict = parser_dict
-        if parser_dict['parser_type'] == 'table':
+        if 'html_object_iterator' in parser_dict.keys():
+            html_object_iterator = HTMLObjectIteratorFactory(parser_dict['html_object_iterator'])
+            data_dict_parser = DataDictParserFactory(parser_dict['data_dict_parser']).data_dict_parser
+            self.parser = GenericParserObject(html_object_iterator, data_dict_parser)
+        elif parser_dict['parser_type'] == 'table':
             if 'table_id' in parser_dict.keys():
                 self.parser = TableParserObject(get_tr_of_table_with_id(parser_dict['table_id']), self._get_narrow_down_function(parser_dict['narrow_down_function']), DataDictParserFactory(parser_dict['data_dict_parser']).data_dict_parser)
             else:
