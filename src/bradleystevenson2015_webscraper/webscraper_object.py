@@ -94,7 +94,7 @@ class NewWebscraperObject(WebscraperObject):
             for parser in self.parsers:
                 data = parser.parse_page(soup, {}, webscraperObjectCollection)
                 for data_dict in data:
-                    webscraperObjectCollection.databaseObject.tables[self.table_name].append(data_dict)
+                    webscraperObjectCollection.databaseObject.tables[self.object_name].append(data_dict)
 
 
 class WebscraperObjectFactory:
