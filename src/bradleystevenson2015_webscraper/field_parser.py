@@ -31,6 +31,7 @@ class InputDictFieldParser(FieldParser):
         self.input_dict_field = input_dict_field
 
     def parse(self, html_object, data_dict, webscraperObject):
+        print(self.input_dict_field)
         return data_dict[self.input_dict_field]
 
 class StaticFieldParser(FieldParser):
