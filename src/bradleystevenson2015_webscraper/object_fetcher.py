@@ -1,4 +1,4 @@
-from .common_webscraper_functions import get_element, get_children_element, row_has_link
+from .common_webscraper_functions import get_element, get_children_element, row_has_link, true
 
 class HTMLObjectIteratorFactory:
 
