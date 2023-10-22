@@ -31,7 +31,6 @@ class InputDictFieldParser(FieldParser):
         self.input_dict_field = input_dict_field
 
     def parse(self, html_object, data_dict, webscraperObject):
-        print(data_dict)
         return data_dict[self.input_dict_field]
 
 class StaticFieldParser(FieldParser):
@@ -53,6 +52,7 @@ class DynamicFieldParser(FieldParser):
 
     def parse(self, html_object, data_dict, webscraperObject):
         return_value = self.function(html_object)
+        print(self.field_dict)
         if 'object_name' in self.field_dict.keys():
             try:
                 return webscraperObject.databaseObject.tables[self.field_dict['object_name']].get_primary_key_by_search_dict(return_value)
