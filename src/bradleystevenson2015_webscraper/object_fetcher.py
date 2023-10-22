@@ -34,7 +34,7 @@ class HTMLObjectIterator:
         for eligible_element in self.children_object_fetcher.fetch_children(base_object):
             if self.narrow_down_function(eligible_element):
                 return_array.append(eligible_element)
-        return retunr_array
+        return return_array
 
 
 
