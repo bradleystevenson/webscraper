@@ -6,12 +6,12 @@ class URLGenerator:
 
     def generate_urls(self, webscraper_object_collection):
         return_strings = []
+        return_objects = []
         if self.iterator is None:
+            return_objects.append({'data_dict': {}, 'url': self.base_url})
             return_strings.append(self.base_url)
             return return_strings
-        for iteration_string in self.iterator.generate_iterations(webscraper_object_collection):
-            return_strings.append(self.base_url.replace('{replace}', iteration_string))
-        return return_strings
+        return self.iterator.generate_iterations(self.base_url, webscraper_object_collection)
 
 class URLIteratorFactory():
 
@@ -31,7 +31,7 @@ class URLIterator():
     def __init__(self):
         pass
 
-    def generate_iterations(self, webscraper_object_collection):
+    def generate_iterations(self, base_url, webscraper_object_collection):
         pass
 
 class HardcodedURLIterator(URLIterator):
@@ -40,8 +40,11 @@ class HardcodedURLIterator(URLIterator):
         self.hardcoded_strings = hardcoded_strings
         super().__init__()
     
-    def generate_iterations(self, webscraper_object_collection):
-        return self.hardcoded_strings
+    def generate_iterations(self, base_url, webscraper_object_collection):
+        return_array = []
+        for hardcoded_string in self.hardcoded_strings:
+            return_array.append({'data_dict': {}, 'url': base_url.replace('{replace}', hardcoded_string)})
+        return return_array
 
 class ObjectURLIterator(URLIterator):
 
@@ -49,11 +52,11 @@ class ObjectURLIterator(URLIterator):
         self.object_name = object_name
         super().__init__()
 
-    def generate_iterations(self, webscraper_object_collection):
-        return_strings = []
+    def generate_iterations(self, base_url, webscraper_object_collection):
+        return_array = []
         for data_dict in webscraper_object_collection.databaseObject.tables[self.object_name].data:
-            return_strings.append(data_dict['url'])
-        return return_strings
+            return_array.append({'url': base_url.replace('{replace}', data_dict['url']), 'data_dict': data_dict})
+        return return_array
     
 class URLGeneratorFactory:
 

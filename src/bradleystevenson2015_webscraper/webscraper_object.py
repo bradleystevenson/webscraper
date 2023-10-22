@@ -89,10 +89,10 @@ class NewWebscraperObject(WebscraperObject):
         super().__init__(object_name, [object_name], create_from_page_parser)
 
     def create_from_web(self, webscraperObjectCollection):
-        for url in self.url_generator.generate_urls(webscraperObjectCollection):
-            soup = fetch_soup_from_page(url)
+        for url_dict in self.url_generator.generate_urls(webscraperObjectCollection):
+            soup = fetch_soup_from_page(url_dict['url'])
             for parser in self.parsers:
-                data = parser.parse_page(soup, {}, webscraperObjectCollection)
+                data = parser.parse_page(soup, url_dict['data_dict'], webscraperObjectCollection)
                 for data_dict in data:
                     webscraperObjectCollection.databaseObject.tables[self.object_name].append(data_dict)
 
