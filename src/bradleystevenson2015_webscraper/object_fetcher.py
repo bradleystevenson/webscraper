@@ -30,7 +30,7 @@ class HTMLObjectIterator:
 
     def get_valid_elements(self, soup):
         return_array = []
-        base_object = self.base_object_fetcher(soup)
+        base_object = self.base_object_fetcher.fetch(soup)
         for eligible_element in self.children_object_fetcher.fetch_children(base_object):
             if self.narrow_down_function(eligible_element):
                 return_array.append(eligible_element)
