@@ -10,4 +10,5 @@ ticket-009: Create a way for there to be an error if there is a parameter that i
 ticket-010: Create a way to just create the database, so nothing other than required gets run (CHECK)
 ticket-011: Create a way to have URLs be appended for iterating through an object (CHECK)
 ticket-012: Create a way to remove table names and instead use the object name field (CHECK)
-ticket-013: Better format how we get HTML Objects to iterate over
+ticket-013: Better format how we get HTML Objects to iterate over (CHECK)
+ticket-014: Create a way that the URL iterator actually returns the data dict too, so we can actually use it in the future
