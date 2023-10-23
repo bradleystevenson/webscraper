@@ -6,7 +6,9 @@ class URLGenerator:
 
     def generate_urls(self, webscraper_object_collection):
         if self.iterator is None:
-            return {'data_dict': {}, 'url': self.base_url}
+            print('BRAD RETURNING HERE')
+            return_object = {'data_dict': {}, 'url': self.base_url}
+            return return_object
         return self.iterator.generate_iterations(self.base_url, webscraper_object_collection)
 
 class URLIteratorFactory():
