@@ -90,6 +90,7 @@ class NewWebscraperObject(WebscraperObject):
 
     def create_from_web(self, webscraperObjectCollection):
         for url_dict in self.url_generator.generate_urls(webscraperObjectCollection):
+            print("Brad printing new format")
             print(str(url_dict))
             print(str(url_dict))
             soup = fetch_soup_from_page(url_dict['url'])
