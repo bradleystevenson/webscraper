@@ -56,7 +56,7 @@ class DynamicFieldParser(FieldParser):
         logging.info("[WEBSCRAPER] [DynamicFieldParser] [parse] return_value: " + str(return_value))
         if 'object_name' in self.field_dict.keys():
             try:
-                return webscraperObject.databaseObject.tables[self.field_dict['object_name']].get_primary_key_by_search_dict(return_value)
+                return webscraperObject.databaseObject.tables[self.field_dict['object_name']].get_primary_key_by_search_dict({'url': return_value})
             except:
                 logging.info("[WEBSCRAPER] [DynamicFieldParser] Unable to find object match for: " + str(return_value))
                 return webscraperObject.get_webscraper_object_with_name(self.field_dict['object_name']).create_from_page(return_value, webscraperObject)
