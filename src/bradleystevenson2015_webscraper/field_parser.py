@@ -51,8 +51,9 @@ class DynamicFieldParser(FieldParser):
         self.function = get_value_from_element(field_dict)
 
     def parse(self, html_object, data_dict, webscraperObject):
-        logging.info("[WEBSCRAPER] [DynamicFieldParser] html_object: " + str(html_object) + " data_dict: " + str(data_dict))
+        logging.info("[WEBSCRAPER] [DynamicFieldParser] [parse] html_object: " + str(html_object) + " data_dict: " + str(data_dict))
         return_value = self.function(html_object)
+        logging.info("[WEBSCRAPER] [DynamicFieldParser] [parse] return_value: " + str(return_value))
         if 'object_name' in self.field_dict.keys():
             try:
                 return webscraperObject.databaseObject.tables[self.field_dict['object_name']].get_primary_key_by_search_dict(return_value)
