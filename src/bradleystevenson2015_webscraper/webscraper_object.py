@@ -19,7 +19,7 @@ class WebscraperObjectCollection:
         data = json.load(file)
         file.close()
         for webscraper_object in data['objects']:
-            self.webscrapers.append(WebscraperObjectFactory(webscraper_object, custom_objects).webscraper)
+            self.webscrapers.append(WebscraperObjectFactory(webscraper_object, custom_objects).create())
 
 
     def get_webscraper_object_with_name(self, object_name):
@@ -37,7 +37,7 @@ class WebscraperObjectCollection:
         self.databaseObject.insert_into_database()
 
     def _parse_arguments(self, arguments):
-        logging.info("[WEBSCRAPER] [_PARSE_ARGUMENTS] " + str(arguments))
+        logging.info("[WEBSCRAPER] [_parse_arguments] arguments: " + str(arguments))
         return_dict = {}
         for webscraper in self.webscrapers:
             return_dict[webscraper.object_name] = False
@@ -89,12 +89,9 @@ class NewWebscraperObject(WebscraperObject):
         super().__init__(object_name, [object_name], create_from_page_parser)
 
     def create_from_web(self, webscraperObjectCollection):
-        print("Printing the entire return value")
-        print(str(self.url_generator.generate_urls(webscraperObjectCollection)))
-        for url_dict in self.url_generator.generate_urls(webscraperObjectCollection):
-            print("Brad printing new format")
-            print(str(url_dict))
-            print(str(url_dict))
+        url_dicts = self.url_generator.generate_urls(webscraperObjectCollection)
+        logging.info('[WEBSCRAPER] [WebscraperObject] [create_from_web] url_dicts: ' + str(url_dicts))
+        for url_dict in url_dicts:
             soup = fetch_soup_from_page(url_dict['url'])
             for parser in self.parsers:
                 data = parser.parse_page(soup, url_dict['data_dict'], webscraperObjectCollection)
@@ -105,18 +102,23 @@ class NewWebscraperObject(WebscraperObject):
 class WebscraperObjectFactory:
 
     def __init__(self, webscraper_object_dict, custom_objects):
-        self.create_from_page_parser = None
+        self.webscraper_object_dict = webscraper_object_dict
+        self.custom_objects = custom_objects
+
+
+    def create(self):
+        create_from_page_parser = None
         if 'create_from_page_parser' in webscraper_object_dict.keys():
-            self.create_from_page_parser =  CreateFromPageParserFactory(webscraper_object_dict['create_from_page_parser']).create_from_page_parser
-        if 'object_type' not in webscraper_object_dict.keys():
+            create_from_page_parser =  CreateFromPageParserFactory(webscraper_object_dict['create_from_page_parser']).create_from_page_parser
+        if 'object_type' not in self.webscraper_object_dict.keys():
             parsers = []
-            for parser_dict in webscraper_object_dict['parsers']:
+            for parser_dict in self.webscraper_object_dict['parsers']:
                 parsers.append(ParserObjectFactory(parser_dict).parser)
-            url_generator = URLGeneratorFactory(webscraper_object_dict['urls'])
-            self.webscraper = NewWebscraperObject(webscraper_object_dict['object_name'], parsers, url_generator.get_url_generator(), self.create_from_page_parser)
-        elif webscraper_object_dict['object_type'] == 'custom_object':
-            for custom_object in custom_objects:
+            url_generator = URLGeneratorFactory(webscraper_object_dict['urls']).get_url_generator()
+            return NewWebscraperObject(webscraper_object_dict['object_name'], parsers, url_generator, create_from_page_parser)
+        elif self.webscraper_object_dict['object_type'] == 'custom_object':
+            for custom_object in self.custom_objects:
                 if custom_object.object_name == webscraper_object_dict['object_name']:
-                    self.webscraper = custom_object
+                    return custom_object
         else:
             raise Exception("No match for object type")

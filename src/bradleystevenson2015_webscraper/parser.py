@@ -6,7 +6,7 @@ import logging
 class CreateFromPageParserFactory:
 
     def __init__(self, create_from_page_parser_dict) -> None:
-        self.create_from_page_parser = CreateFromPageParser(create_from_page_parser_dict['base_url'], DataDictParserFactory(create_from_page_parser_dict['parser']).data_dict_parser)
+        self.create_from_page_parser = CreateFromPageParser(create_from_page_parser_dict['base_url'], DataDictParserFactory(create_from_page_parser_dict['parser']).create())
 
 
 class CreateFromPageParser:
@@ -62,40 +62,27 @@ class ParserObject:
 
 class ParserObjectFactory:
 
-    def _get_narrow_down_function(self, function_name):
-        if function_name == 'row_has_link':
-            return row_has_link
-        elif function_name == 'true':
-            return true
-        else:
-            raise Exception("No match for narrow down function")
-
-
     def __init__(self, parser_dict):
         self.parser_dict = parser_dict
-        if 'html_object_iterator' in parser_dict.keys():
-            html_object_iterator = HTMLObjectIteratorFactory(parser_dict['html_object_iterator']).create()
-            data_dict_parser = DataDictParserFactory(parser_dict['data_dict_parser']).data_dict_parser
-            self.parser = GenericParserObject(html_object_iterator, data_dict_parser)
-        elif parser_dict['parser_type'] == 'table':
-            if 'table_id' in parser_dict.keys():
-                self.parser = TableParserObject(get_tr_of_table_with_id(parser_dict['table_id']), self._get_narrow_down_function(parser_dict['narrow_down_function']), DataDictParserFactory(parser_dict['data_dict_parser']).data_dict_parser)
-            else:
-                self.parser = TableParserObject(get_tr_of_stats_table(), self._get_narrow_down_function(parser_dict['narrow_down_function']), DataDictParserFactory(parser_dict['data_dict_parser']).data_dict_parser)
-        elif parser_dict['parser_type'] == 'generic':
-            self.parser = ParserObject(get_element(parser_dict['base_object']), get_children_element(parser_dict['base_element']))
-        else:
-            raise Exception("No match for parser type")
+        html_object_iterator = HTMLObjectIteratorFactory(parser_dict['html_object_iterator']).create()
+        data_dict_parser = DataDictParserFactory(parser_dict['data_dict_parser']).data_dict_parser
+        self.parser = GenericParserObject(html_object_iterator, data_dict_parser)
 
 
 class DataDictParserFactory:
 
     def __init__(self, data_dict_parser_dict):
-        logging.info('[DataDictParserFactory] [Init] ' + str(data_dict_parser_dict))
+        self.data_dict_parser_dict = data_dict_parser_dict
         field_parsers = []
         for field_dict in data_dict_parser_dict:
-            field_parsers.append(FieldParserFactory(field_dict).get_field_parser())
+            field_parsers.append(FieldParserFactory(field_dict).create())
         self.data_dict_parser = DataDictParser(field_parsers)
+
+    def create(self):
+        field_parsers = []
+        for field_dict in data_dict_parser_dict:
+            field_parsers.append(FieldParserFactory(field_dict).create())
+        return DataDictParser(field_parsers)
 
 class DataDictParser:
 

@@ -5,7 +5,7 @@ class FieldParserFactory:
     def __init__(self, field_dict):
         self.field_dict = field_dict
 
-    def get_field_parser(self):
+    def create(self):
         if self.field_dict['parse_type'] == 'static':
             return StaticFieldParser(self.field_dict['field_name'], self.field_dict['static_value'])
         elif self.field_dict['parse_type'] == 'input_dict':
@@ -51,12 +51,13 @@ class DynamicFieldParser(FieldParser):
         self.function = get_value_from_element(field_dict)
 
     def parse(self, html_object, data_dict, webscraperObject):
+        logging.info("[WEBSCRAPER] [DynamicFieldParser] html_object: " + str(html_object) + " data_dict: " + str(data_dict))
         return_value = self.function(html_object)
-        print(self.field_dict)
         if 'object_name' in self.field_dict.keys():
             try:
                 return webscraperObject.databaseObject.tables[self.field_dict['object_name']].get_primary_key_by_search_dict(return_value)
             except:
+                logging.info("[WEBSCRAPER] [DynamicFieldParser] Unable to find object match for: " + str(return_value))
                 return webscraperObject.get_webscraper_object_with_name(self.field_dict['object_name']).create_from_page(return_value, webscraperObject)
         return return_value
     

@@ -14,7 +14,7 @@ class URLIteratorFactory():
     def __init__(self, url_iterator_dict):
         self.url_iterator_dict = url_iterator_dict
 
-    def get_url_iterator(self):
+    def create(self):
         if 'hardcoded' in self.url_iterator_dict.keys():
             return HardcodedURLIterator(self.url_iterator_dict['hardcoded'])
         elif 'object' in self.url_iterator_dict.keys():
@@ -61,6 +61,6 @@ class URLGeneratorFactory:
 
     def get_url_generator(self):
         if 'iterator' in self.url_dict.keys():
-            return URLGenerator(self.url_dict['base_url'], URLIteratorFactory(self.url_dict['iterator']).get_url_iterator())
+            return URLGenerator(self.url_dict['base_url'], URLIteratorFactory(self.url_dict['iterator']).create())
         else:
             return URLGenerator(self.url_dict['base_url'])
