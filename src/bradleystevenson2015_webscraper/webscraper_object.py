@@ -115,7 +115,7 @@ class WebscraperObjectFactory:
             for parser_dict in self.webscraper_object_dict['parsers']:
                 parsers.append(ParserObjectFactory(parser_dict).parser)
             url_generator = URLGeneratorFactory(self.webscraper_object_dict['urls']).get_url_generator()
-            return NewWebscraperObject(webscraper_object_dict['object_name'], parsers, url_generator, create_from_page_parser)
+            return NewWebscraperObject(self.webscraper_object_dict['object_name'], parsers, url_generator, create_from_page_parser)
         elif self.webscraper_object_dict['object_type'] == 'custom_object':
             for custom_object in self.custom_objects:
                 if custom_object.object_name == self.webscraper_object_dict['object_name']:
