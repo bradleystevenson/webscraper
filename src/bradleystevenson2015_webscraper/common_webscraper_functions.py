@@ -12,19 +12,13 @@ def get_element(field_dict):
         attributes = field_dict['attributes']
     if 'id' in field_dict.keys():
         def return_function(html_object):
-            print(html_object)
-            print(attributes)
             return html_object.find(id=field_dict['id'])
         return return_function
     if element_type is None:
         def return_function(html_object):
-            print(html_object)
-            print(attributes)
             return html_object.find(attrs=attributes)
         return return_function
     def return_function(html_object):
-        print(html_object)
-        print(attributes)
         return html_object.find(element_type, attrs=attributes)
     return return_function
 
