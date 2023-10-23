@@ -1,4 +1,5 @@
 from .common_webscraper_functions import get_value_from_element, does_html_object_exist
+import logging
 
 class FieldParserFactory:
 
