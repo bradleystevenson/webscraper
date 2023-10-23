@@ -65,7 +65,7 @@ class ParserObjectFactory:
     def __init__(self, parser_dict):
         self.parser_dict = parser_dict
         html_object_iterator = HTMLObjectIteratorFactory(parser_dict['html_object_iterator']).create()
-        data_dict_parser = DataDictParserFactory(parser_dict['data_dict_parser']).data_dict_parser
+        data_dict_parser = DataDictParserFactory(parser_dict['data_dict_parser']).create()
         self.parser = GenericParserObject(html_object_iterator, data_dict_parser)
 
 
