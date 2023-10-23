@@ -89,6 +89,8 @@ class NewWebscraperObject(WebscraperObject):
         super().__init__(object_name, [object_name], create_from_page_parser)
 
     def create_from_web(self, webscraperObjectCollection):
+        print("Printing the entire return value")
+        print(str(self.url_generator.generate_urls(webscraperObjectCollection)))
         for url_dict in self.url_generator.generate_urls(webscraperObjectCollection):
             print("Brad printing new format")
             print(str(url_dict))
