@@ -108,17 +108,17 @@ class WebscraperObjectFactory:
 
     def create(self):
         create_from_page_parser = None
-        if 'create_from_page_parser' in webscraper_object_dict.keys():
+        if 'create_from_page_parser' in self.webscraper_object_dict.keys():
             create_from_page_parser =  CreateFromPageParserFactory(webscraper_object_dict['create_from_page_parser']).create_from_page_parser
         if 'object_type' not in self.webscraper_object_dict.keys():
             parsers = []
             for parser_dict in self.webscraper_object_dict['parsers']:
                 parsers.append(ParserObjectFactory(parser_dict).parser)
-            url_generator = URLGeneratorFactory(webscraper_object_dict['urls']).get_url_generator()
+            url_generator = URLGeneratorFactory(self.webscraper_object_dict['urls']).get_url_generator()
             return NewWebscraperObject(webscraper_object_dict['object_name'], parsers, url_generator, create_from_page_parser)
         elif self.webscraper_object_dict['object_type'] == 'custom_object':
             for custom_object in self.custom_objects:
-                if custom_object.object_name == webscraper_object_dict['object_name']:
+                if custom_object.object_name == self.webscraper_object_dict['object_name']:
                     return custom_object
         else:
             raise Exception("No match for object type")
