@@ -44,7 +44,6 @@ class GenericParserObject:
     def parse_page(self, soup, data_dict, webscraper_object_collection):
         return_array = []
         for eligible_element in self.html_object_iterator.get_valid_elements(soup):
-            print(eligible_element)
             return_array.append(self.data_dict_parser.parse(eligible_element, data_dict, webscraper_object_collection))
         return return_array 
 
