@@ -109,7 +109,7 @@ class WebscraperObjectFactory:
     def create(self):
         create_from_page_parser = None
         if 'create_from_page_parser' in self.webscraper_object_dict.keys():
-            create_from_page_parser =  CreateFromPageParserFactory(webscraper_object_dict['create_from_page_parser']).create_from_page_parser
+            create_from_page_parser =  CreateFromPageParserFactory(self.webscraper_object_dict['create_from_page_parser']).create_from_page_parser
         if 'object_type' not in self.webscraper_object_dict.keys():
             parsers = []
             for parser_dict in self.webscraper_object_dict['parsers']:
