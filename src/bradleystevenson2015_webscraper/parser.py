@@ -73,14 +73,10 @@ class DataDictParserFactory:
 
     def __init__(self, data_dict_parser_dict):
         self.data_dict_parser_dict = data_dict_parser_dict
-        field_parsers = []
-        for field_dict in data_dict_parser_dict:
-            field_parsers.append(FieldParserFactory(field_dict).create())
-        self.data_dict_parser = DataDictParser(field_parsers)
 
     def create(self):
         field_parsers = []
-        for field_dict in data_dict_parser_dict:
+        for field_dict in self.data_dict_parser_dict:
             field_parsers.append(FieldParserFactory(field_dict).create())
         return DataDictParser(field_parsers)
 
