@@ -29,12 +29,45 @@ class WebscraperObjectCollection:
 
     def run(self, arguments):
         if '--create-tables' in arguments:
-            self.databaseObject.create_tables()
-            exit(0)
+            self.run_create_tables()
+        if '--help' in arguments:
+            self.run_help()
+        if '--single-page' in arguments:
+            self.run_single_page
+        self.run_normal()
+
+    def run_help(self):
+        print('--help')
+        print(' print the help menu')
+        print('--create-tables')
+        print(' create the different tables in the database')
+        print('--single-page')
+        print(' create from a single page')
+        print(' arguments:')
+        print('     object_name: name of the object to run this for')
+        print('     url: url of the page to test')
+        print('     data_dict: data dict of the object to run')
+        exit(0)
+
+    def run_create_tables(self):
+        self.databaseObject.create_tables()
+        exit(0)
+
+    def run_normal(self):
         create_from_web_dict = self._parse_arguments(arguments)
         for webscraper in self.webscrapers:
             webscraper.create(create_from_web_dict[webscraper.object_name], self)
         self.databaseObject.insert_into_database()
+
+    def run_single_page(self, arguments):
+        object_name = arguments[3]
+        url = arguments[4]
+        data_dict = arguments[5]
+        url_dict = {'url': url, 'data_dict': data_dict}
+        return_data = self.objects[object_name].create_from_url(url_dict, self)
+        print(str(return_data))
+        exit(0)
+    
 
     def _parse_arguments(self, arguments):
         logging.info("[WEBSCRAPER] [_parse_arguments] arguments: " + str(arguments))
@@ -92,11 +125,21 @@ class NewWebscraperObject(WebscraperObject):
         url_dicts = self.url_generator.generate_urls(webscraperObjectCollection)
         logging.info('[WEBSCRAPER] [WebscraperObject] [create_from_web] url_dicts: ' + str(url_dicts))
         for url_dict in url_dicts:
-            soup = fetch_soup_from_page(url_dict['url'])
-            for parser in self.parsers:
-                data = parser.parse_page(soup, url_dict['data_dict'], webscraperObjectCollection)
-                for data_dict in data:
-                    webscraperObjectCollection.databaseObject.tables[self.object_name].append(data_dict)
+            data_dicts = self.create_from_url(webscraperObjectCollection, url_dict)
+            for data_dict in data_dicts:
+                webscraperObjectCollection.databaseObject.tables[self.object_name].append(data_dict)
+
+
+    def create_from_url(self, webscraper_object_collection, url_dict):
+        logging.info('[WebscraperObject] [create_from_url] url_dict: ' + str(url_dict))
+        soup = fetch_soup_from_page(url_dict['url'])
+        return_data = []
+        for parser in self.parsers:
+            data = parser.parse_page(soup, url_dict['data_dict'], webscraper_object_collection)
+            return_data.extend(data)
+        return return_data
+
+
 
 
 class WebscraperObjectFactory:
