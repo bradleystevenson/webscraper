@@ -34,7 +34,7 @@ class WebscraperObjectCollection:
             self.run_help()
         if '--single-page' in arguments:
             self.run_single_page
-        self.run_normal()
+        self.run_normal(arguments)
 
     def run_help(self):
         print('--help')
@@ -53,7 +53,7 @@ class WebscraperObjectCollection:
         self.databaseObject.create_tables()
         exit(0)
 
-    def run_normal(self):
+    def run_normal(self, arguments):
         create_from_web_dict = self._parse_arguments(arguments)
         for webscraper in self.webscrapers:
             webscraper.create(create_from_web_dict[webscraper.object_name], self)
