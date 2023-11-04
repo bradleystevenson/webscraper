@@ -70,6 +70,11 @@ def does_html_object_exist(field_dict):
         return 0
     return return_function
 
+def get_field_with_text(text_name): 
+    def return_function(html_object):
+        return text_name in html_object.text
+    return return_function
+
 def get_tr_of_table_with_id(table_id):
     def return_function(soup):
         return soup.find(id=table_id).find("tbody").find_all("tr")
@@ -79,6 +84,8 @@ def get_tr_of_stats_table():
     def return_function(soup):
         return soup.find(attrs={'class': 'stats_table'}).find('tbody').find_all('tr')
     return return_function
+
+
 
 def row_has_link(html_object):
     return html_object.find("a") is not None

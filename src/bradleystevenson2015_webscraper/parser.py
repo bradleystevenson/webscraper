@@ -21,21 +21,7 @@ class CreateFromPageParser:
         data_dict['url'] = url
         return data_dict
 
-class TableParserObject:
-
-    def __init__(self, all_object_selection_function, narrow_down_function, data_dict_parser):
-        self.all_object_selection_function = all_object_selection_function
-        self.narrow_down_function = narrow_down_function
-        self.data_dict_parser = data_dict_parser
-
-    def parse_page(self, soup, data_dict, webscraperObjectCollection):
-        return_array = []
-        for eligible_element in self.all_object_selection_function(soup):
-            if self.narrow_down_function(eligible_element):
-                return_array.append(self.data_dict_parser.parse(eligible_element, data_dict, webscraperObjectCollection))
-        return return_array
-
-class GenericParserObject:
+class ParserObject:
 
     def __init__(self, html_object_iterator: HTMLObjectIterator, data_dict_parser):
         self.html_object_iterator = html_object_iterator
@@ -47,25 +33,13 @@ class GenericParserObject:
             return_array.append(self.data_dict_parser.parse(eligible_element, data_dict, webscraper_object_collection))
         return return_array 
 
-class ParserObject:
-
-    def __init__(self, base_object_function, children_element_function):
-        self.base_object_function = base_object_function
-        self.children_element_function = children_element_function
-
-    def parse_page(self, soup, data_dict, webscraperObjectCollection):
-        return_array = []
-        for eligible_element in self.children_element_function(self.base_object_function(soup)):
-            return_array.append(self.data_dict_parser.parse(eligible_element, data_dict, webscraperObjectCollection))
-        return return_array
-
 class ParserObjectFactory:
 
     def __init__(self, parser_dict):
         self.parser_dict = parser_dict
         html_object_iterator = HTMLObjectIteratorFactory(parser_dict['html_object_iterator']).create()
         data_dict_parser = DataDictParserFactory(parser_dict['data_dict_parser']).create()
-        self.parser = GenericParserObject(html_object_iterator, data_dict_parser)
+        self.parser = ParserObject(html_object_iterator, data_dict_parser)
 
 
 class DataDictParserFactory:

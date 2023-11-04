@@ -12,4 +12,6 @@ ticket-011: Create a way to have URLs be appended for iterating through an objec
 ticket-012: Create a way to remove table names and instead use the object name field (CHECK)
 ticket-013: Better format how we get HTML Objects to iterate over (CHECK)
 ticket-014: Create a way that the URL iterator actually returns the data dict too, so we can actually use it in the future (CHECK)
-ticket-015: Create a way for us to run the one page scraper
+ticket-015: Create a way for us to run the one page scraper (CHECK)
+ticket-016: Create a way to comb over and get the object matching text (CHECK)
+ticket-017: Remove the need to have a true object_narrow_down function, just have it skip that step

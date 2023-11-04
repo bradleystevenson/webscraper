@@ -1,11 +1,14 @@
-from .common_webscraper_functions import get_element, get_children_element, row_has_link, true
+from .common_webscraper_functions import get_element, get_children_element, row_has_link, true, get_field_with_text
 
 class HTMLObjectIteratorFactory:
 
 
-    def _get_narrow_down_function(self, function_name):
+    def _get_narrow_down_function(self):
+        function_name = self.data_dict['narrow_down_function']
         if function_name == 'row_has_link':
             return row_has_link
+        elif function_name == 'object_has_text':
+            return get_field_with_text(self.data_dict['text'])
         elif function_name == 'true':
             return true
         else:
@@ -17,7 +20,7 @@ class HTMLObjectIteratorFactory:
     def create(self):
         base_object_fetcher = ObjectFetcherFactory(self.data_dict['base_object']).get_object_fetcher()
         children_object_fetcher = ChildrenObjectFetcher(self.data_dict['children_objects'])
-        narrow_down_function = self._get_narrow_down_function(self.data_dict['narrow_down_function'])
+        narrow_down_function = self._get_narrow_down_function()
         return HTMLObjectIterator(base_object_fetcher, children_object_fetcher, narrow_down_function)
 
 
