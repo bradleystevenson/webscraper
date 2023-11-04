@@ -1,4 +1,5 @@
 from .common_webscraper_functions import get_element, get_children_element, row_has_link, true, get_field_with_text
+import logging
 
 class HTMLObjectIteratorFactory:
 
