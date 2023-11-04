@@ -36,8 +36,11 @@ class HTMLObjectIterator:
     def get_valid_elements(self, soup):
         return_array = []
         base_object = self.base_object_fetcher.fetch(soup)
+        logging.info('[HTMLObjectIterator] [get_valid_elements] base_object: ' + str(base_object))
         for eligible_element in self.children_object_fetcher.fetch_children(base_object):
+            logging.info('[HTMLObjectIterator] [get_valid_elements] eligible_element ' + str(eligible_element))
             if self.narrow_down_function(eligible_element):
+                logging.info('[HTMLObjectIterator] [get_valid_elements] adding_element: ' + str(eligible_element))
                 return_array.append(eligible_element)
         return return_array
 
