@@ -18,6 +18,7 @@ class HTMLObjectIteratorFactory:
         self.data_dict = data_dict
 
     def create(self):
+        logging.info('[HTMLObjectIteratorFactory] [create] self.data_dict: ' + str(self.data_dict))
         base_object_fetcher = ObjectFetcherFactory(self.data_dict['base_object']).get_object_fetcher()
         children_object_fetcher = ChildrenObjectFetcher(self.data_dict['children_objects'])
         narrow_down_function = self._get_narrow_down_function()
