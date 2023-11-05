@@ -15,3 +15,4 @@ ticket-014: Create a way that the URL iterator actually returns the data dict to
 ticket-015: Create a way for us to run the one page scraper (CHECK)
 ticket-016: Create a way to comb over and get the object matching text (CHECK)
 ticket-017: Remove the need to have a true object_narrow_down function, just have it skip that step
+ticket-018: Create a way to see if element type is a, we dont need to find the a in it
