@@ -106,6 +106,7 @@ class WebscraperObject:
             webscraperObjectCollection.databaseObject.tables[table_name].generate_from_database()
 
     def create_from_page(self, url, webscraperObjectCollection):
+        logging.info("[WebscraperObject] [create_from_page] url: " + url)
         if self.create_from_page_parser is None:
             raise Exception("We have no way to create this object")
         data_dict = self.create_from_page_parser.parse(url, webscraperObjectCollection)
