@@ -6,6 +6,9 @@ import logging
 def get_element(field_dict):
     element_type = None
     attributes = {}
+    index = None
+    if 'index' in field_dict.keys():
+        index = int(field_dict['index'])
     if 'element_type' in field_dict.keys():
         element_type = field_dict['element_type']
     if 'attributes' in field_dict.keys():
@@ -18,6 +21,9 @@ def get_element(field_dict):
         def return_function(html_object):
             return html_object.find(attrs=attributes)
         return return_function
+    if index is not None:
+        def return_function(html_object):
+            return html_object.children(element_type)[index]
     def return_function(html_object):
         return html_object.find(element_type, attrs=attributes)
     return return_function
@@ -77,17 +83,6 @@ def get_field_with_text(text_name):
     def return_function(html_object):
         return text_name in html_object.text
     return return_function
-
-def get_tr_of_table_with_id(table_id):
-    def return_function(soup):
-        return soup.find(id=table_id).find("tbody").find_all("tr")
-    return return_function
-
-def get_tr_of_stats_table():
-    def return_function(soup):
-        return soup.find(attrs={'class': 'stats_table'}).find('tbody').find_all('tr')
-    return return_function
-
 
 def row_has_link(html_object):
     return html_object.find("a") is not None
