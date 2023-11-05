@@ -45,7 +45,10 @@ def get_rough_value_from_element(field_dict):
     logging.info("[GET_ROUGH_VALUE_FROM_ELEMENT] " + str(field_dict))
     if field_dict['html_field_value'] == 'url':
         def return_function(html_object):
-            return get_element(field_dict)(html_object).find('a')['href']
+            found_object = get_element(field_dict)(html_object)
+            if found_object.name == 'a':
+                return found_object['href']
+            return found_object.find('a')['href']
         return return_function
     elif field_dict['html_field_value'] == 'text':
         def return_function(html_object):
@@ -84,7 +87,6 @@ def get_tr_of_stats_table():
     def return_function(soup):
         return soup.find(attrs={'class': 'stats_table'}).find('tbody').find_all('tr')
     return return_function
-
 
 
 def row_has_link(html_object):
